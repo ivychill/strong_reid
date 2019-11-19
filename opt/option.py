@@ -27,7 +27,7 @@ parser.add_argument('--version',
 
 parser.add_argument('--weight', 
                     type= str, 
-                    default='out/res101_ibn_1/model_215.pth', 
+                    default='out/res50_ibn_1/model_110.pth',
                     help='weight')
 
 parser.add_argument('--model_name',

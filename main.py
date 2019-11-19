@@ -19,7 +19,7 @@ import random
 import time
 from tqdm import tqdm
 import json
-from utils import re_ranking
+from utils.re_ranking import reRanking
 
 
 class Main():
@@ -118,7 +118,7 @@ class Main():
         distmat = distmat.cpu().numpy()
         self.writeResult(distmat,json_file)
         print('re_ranking ...')
-        distmat_rk = re_ranking(qf, gf, 7, 3, 0.85)
+        distmat_rk = reRanking(qf, gf, 7, 3, 0.85)
         self.writeResult(distmat_rk, json_file_rk)
 
         # print('distmat:', distmat.shape)

@@ -117,3 +117,17 @@ Epoch[108]:  * Base_lr 3.00e-06	* Accuray 1.000	* Loss 1.250
 Epoch[109]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
 Epoch[110]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.248
 Epoch[111]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.249
+Epoch[112]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
+Epoch[113]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
+Epoch[114]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.249
+Epoch[115]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
+Epoch[116]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.249
+Epoch[117]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.251
+Epoch[118]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
+Epoch[119]:  * Base_lr 3.00e-06	* Accuray 0.999	* Loss 1.250
+Epoch[120]:  * Base_lr 3.00e-07	* Accuray 0.999	* Loss 1.248
+Epoch[121]:  * Base_lr 3.00e-07	* Accuray 1.000	* Loss 1.250
+Epoch[122]:  * Base_lr 3.00e-07	* Accuray 1.000	* Loss 1.247
+Epoch[123]:  * Base_lr 3.00e-07	* Accuray 0.999	* Loss 1.247
+Epoch[124]:  * Base_lr 3.00e-07	* Accuray 0.999	* Loss 1.248
+Epoch[125]:  * Base_lr 3.00e-07	* Accuray 0.999	* Loss 1.249
