@@ -53,9 +53,9 @@ class ImageDataset(Dataset):
 
 class Kesci(BaseImageDataset):
 
-    dataset_dir = 'Round_1'
+    dataset_dir = 'sz_reid_round1'
 
-    def __init__(self, root='/data/huachunrui/datasets/reid_data', verbose=True, **kwargs):
+    def __init__(self, root='/usr/zll/person_reid/data/sz_reid_aug', verbose=True, **kwargs):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
         self.train_dir = osp.join(self.dataset_dir, 'aug_train_list_1.txt')
@@ -160,6 +160,6 @@ class Data():
         print('test:', len(self.test_set))
         print('test:', len(self.test_loader))
 
-if __name__ == '__main__':
-
-    data = Data()
+# if __name__ == '__main__':
+#
+#     data = Data()

@@ -19,6 +19,7 @@ import random
 import time
 from tqdm import tqdm
 import json
+from utils import re_ranking
 
 
 class Main():
@@ -96,6 +97,9 @@ class Main():
 
     def pre(self):
 
+        json_file = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '.json'
+        json_file_rk = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '_rk.json'
+
         self.model.eval()
         t1 = time.time()
         print('extract features, this may take a few minutes')
@@ -110,36 +114,57 @@ class Main():
         distmat = torch.pow(qf, 2).sum(dim=1, keepdim=True).expand(m, n) + \
                   torch.pow(gf, 2).sum(dim=1, keepdim=True).expand(n, m).t()
         distmat.addmm_(1, -2, qf, gf.t())
+
         distmat = distmat.cpu().numpy()
+        self.writeResult(distmat,json_file)
+        print('re_ranking ...')
+        distmat_rk = re_ranking(qf, gf, 7, 3, 0.85)
+        self.writeResult(distmat_rk, json_file_rk)
 
+        # print('distmat:', distmat.shape)
+        # index = np.argsort(distmat)  # from small to large
+        # max_index = index[:, :200]
+        # print(max_index.shape)
+        #
+        # # Visualize the rank result
+        # results = {}
+        # json_file = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '.json'
+        # json_file_rk = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '_rk.json'
+        # for i in range(len(self.query_paths)):
+        #     query_name = self.query_paths[i].split('/')[-1]
+        #     index_mask = max_index[i]
+        #     gallery_name = [self.gallery_paths[k].split('/')[-1] for k in index_mask]
+        #     #print(index_mask)
+        #
+        #     results[query_name] = gallery_name
+        #     #print(res)
+        #
+        # with open(json_file, 'w', encoding='utf-8') as fp:
+        #     json.dump(results, fp)
+
+        print('Time cost is: {:.2f} s'.format(time.time()-t1))
+        print('over!')
+        # print(json_file)
+        # print(max_index)
+
+    def writeResult(self,distmat,json_file):
         print('distmat:', distmat.shape)
-
-
         index = np.argsort(distmat)  # from small to large
         max_index = index[:, :200]
         print(max_index.shape)
-
-        # Visualize the rank result
         results = {}
         for i in range(len(self.query_paths)):
             query_name = self.query_paths[i].split('/')[-1]
             index_mask = max_index[i]
             gallery_name = [self.gallery_paths[k].split('/')[-1] for k in index_mask]
-            #print(index_mask)
-
+            # print(index_mask)
             results[query_name] = gallery_name
-            #print(res)
-
-        json_file = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '.json'
+            # print(res)
 
         with open(json_file, 'w', encoding='utf-8') as fp:
             json.dump(results, fp)
 
-        print('Time cost is: {:.2f} s'.format(time.time()-t1))
-             
-        print('over!')
-        print(json_file)
-        print(max_index)
+
         
 
 if __name__ == '__main__':
@@ -152,7 +177,7 @@ if __name__ == '__main__':
     print('********* opt config *********')
     print(opt,'\n')
 
-    log_file = 'log/' + opt.version + '.txt'
+    log_file = 'log/' + opt.version + time.strftime("%Y%m%d%H%M%S") + '.txt'
     with open(log_file, 'a') as f:
         f.write(str(opt) + '\n')
         f.flush()

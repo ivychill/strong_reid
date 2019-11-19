@@ -10,7 +10,7 @@ import argparse
 parser = argparse.ArgumentParser(description='reid option')
 
 parser.add_argument('--data_path',
-                    default="/data/huachunrui/datasets/reid_data",
+                    default="/usr/zll/person_reid/data/sz_reid_aug",
                     help='path of data')
 parser.add_argument('--gpus', 
                     default="0", 
@@ -63,7 +63,7 @@ parser.add_argument('--instance',
                     help='instance for each id in a batch')
 
 parser.add_argument('--model_path',
-                    default='/data/huachunrui/.torch/models/resnext101_ibn_a.pth.tar',
+                    default='/home/kc/.torch/models/resnext101_ibn_a.pth.tar',
                     help='pretrained model ')
 
 parser.add_argument('--MARGIN',
