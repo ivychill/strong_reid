@@ -13,7 +13,7 @@ parser.add_argument('--data_path',
                     default="/home/kcadmin/user/fengchen/reid/dataset",
                     help='path of data')
 parser.add_argument('--gpus', 
-                    default="0", 
+                    default="0",
                     type=str, 
                     help='gpu device id')
 
@@ -22,16 +22,16 @@ parser.add_argument('--resume',
                     help='resume from a ckpt')
 
 parser.add_argument('--version', 
-                    default='resnext101_ibn_a',
+                    default='se_resnext50_dw',
                     help='version')
 
 parser.add_argument('--weight', 
                     type= str, 
-                    default='out/resnext101_ibn_a/model_140.pth',
+                    default='out/se_resnext50/model_120.pth',
                     help='weight')
 
 parser.add_argument('--model_name',
-                    default='resnext101_ibn_a',
+                    default='se_resnext50',
                     help='backbone of the network')
 
 parser.add_argument('--pretrained',
@@ -63,7 +63,7 @@ parser.add_argument('--instance',
                     help='instance for each id in a batch')
 
 parser.add_argument('--model_path',
-                    default='/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
+                    default='/home/kc/.torch/models/se_resnext50_32x4d-a260b3a4.pth',
                     help='pretrained model ')
 
 parser.add_argument('--MARGIN',
@@ -76,7 +76,7 @@ parser.add_argument('--optimizer',
                     help='the mode of the optimizer')
 
 parser.add_argument('--lr',
-                    default=3e-4,
+                    default=35e-4,
                     help='initial learning_rate')
 
 parser.add_argument('--wd',
@@ -96,7 +96,7 @@ parser.add_argument('--momentum',
                     help='initial momentum')
 
 parser.add_argument('--steps',
-                    default=[50, 90, 120],
+                    default=[40, 80],
                     help='MultiStepLR,decay the learning rate')
 
 parser.add_argument("--batchid",
@@ -110,5 +110,7 @@ parser.add_argument("--batchimage",
 parser.add_argument("--batchtest",
                     default=32,
                     help='the batch size for test')
+
+parser.add_argument('--evaluate',action='store_true',help='path of data')
 
 opt = parser.parse_args()
