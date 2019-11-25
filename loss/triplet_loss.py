@@ -145,3 +145,25 @@ class CrossEntropyLabelSmooth(nn.Module):
         targets = (1 - self.epsilon) * targets + self.epsilon / self.num_classes
         loss = (- targets * log_probs).mean(0).sum()
         return loss
+
+# Unknown Identity Rejection Loss
+class IrlLoss(nn.Module):
+    """
+    label: 1/N
+    """
+    def __init__(self, num_classes, epsilon=0.1, use_gpu=True):
+        super(CrossEntropyLabelSmooth, self).__init__()
+        self.num_classes = num_classes
+        self.use_gpu = use_gpu
+
+    def forward(self, inputs):
+        """
+        Args:
+            inputs: prediction matrix (before softmax) with shape (batch_size, num_classes)
+            targets: ground truth labels with shape (num_classes)
+        """
+        log_probs = self.logsoftmax(inputs)
+        targets = torch.ones(log_probs.size())/self.num_classes
+        if self.use_gpu: targets = targets.cuda()
+        loss = (- targets * log_probs).mean(0).sum()
+        return loss

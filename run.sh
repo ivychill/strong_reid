@@ -3,7 +3,7 @@
 case $1 in
 
     train)
-        python main.py --gpus=1 --batch=64
+        python main.py --gpus=3 --batch=64 --wd 1e-3
         ;;
 
     test)

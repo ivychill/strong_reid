@@ -53,13 +53,13 @@ class ImageDataset(Dataset):
 
 class Kesci(BaseImageDataset):
 
-    dataset_dir = 'sz_reid'
+    dataset_dir = 'plustest'
 
     def __init__(self, root='/home/kcadmin/user/fengchen/reid/dataset', verbose=True, **kwargs):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
-        self.train_dir = osp.join(self.dataset_dir, 'aug_train_list_1.txt')
-        print(self.train_dir )
+        self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
+        print(self.train_dir)
         self.query_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
         self.gallery_dir = osp.join(self.dataset_dir, 'gallery_a')
 

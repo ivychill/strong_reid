@@ -20,6 +20,7 @@ import time
 from tqdm import tqdm
 import json
 from utils.re_ranking import reRanking
+import scipy.io
 
 
 def writeResult(data, distmat, json_file, max_rank=200):
@@ -39,6 +40,39 @@ def writeResult(data, distmat, json_file, max_rank=200):
         json.dump(results, fp)
     print('save result :',json_file)
 
+def gen_feat(opt, data):
+    if opt.model_name == 'se_resnext50':
+        model = build_model(opt, 2432)
+        model.load_state_dict(torch.load(opt.weight))
+    else:
+        model = build_model(opt, data.num_classes)
+        model.load_state_dict(torch.load(opt.weight)['state_dict'])
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+    model = model.to("cuda")
+    model.eval()
+
+    feat = extract_feature(model, tqdm(data.test_loader))
+    print('feat:', feat.shape)
+
+    # Save to Matlab for check
+    feature = feat.numpy()
+    result = {'test_f': feature}
+    scipy.io.savemat(os.path.join('out', opt.model_name, 'feature.mat'), result)
+
+    return feature
+
+def get_feat(model_name):
+    result = scipy.io.loadmat(os.path.join('out', model_name, 'feature.mat'))
+    if model_name == 'densenet121':
+        query_feature = result['query_f']
+        gallery_feature = result['gallery_f']
+        result = np.append(query_feature, gallery_feature, axis=0)*0.5
+    else:
+        result = result['test_f']
+    result = torch.from_numpy(result)
+
+    return result
 
 if __name__ == '__main__':
         # 随机种子
@@ -47,7 +81,6 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    print('********* opt config *********')
     print(opt,'\n')
     time_str = time.strftime("_%Y%m%d_%H%M%S", time.localtime())
     opt.version = opt.version+time_str
@@ -68,31 +101,19 @@ if __name__ == '__main__':
         {'model_name': 'resnext101_ibn_a',
          'model_path': '/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
          'weight': 'out/resnext101_ibn_a/model_140.pth'},
+        {'model_name': 'densenet121'},
     ]
 
+    # for index, model_opt in enumerate(models):
+    # for index in range(len(models)-1):
+    #     opt.model_name = models[index]['model_name']
+    #     opt.model_path = models[index]['model_path']
+    #     opt.weight = models[index]['weight']
+    #     feat = gen_feat(opt, data)
+
     feats = []
-    for index, model_opt in enumerate(models):
-        opt.model_name = model_opt['model_name']
-        opt.model_path = model_opt['model_path']
-        opt.weight = model_opt['weight']
-        if index == 0:
-            model = build_model(opt, 2432)
-            model.load_state_dict(torch.load(model_opt['weight']))
-        else:
-            model = build_model(opt, data.num_classes)
-            model.load_state_dict(torch.load(model_opt['weight'])['state_dict'])
-        if torch.cuda.device_count() > 1:
-            model = torch.nn.DataParallel(model)
-        model = model.to("cuda")
-        model.eval()
-
-        json_file = 'results/val_result_' +str(index)+ time_str + '.json'
-        json_file_rk = 'results/val_result_' +str(index)+ time_str + '_rk.json'
-
-        t1 = time.time()
-        print('extract features, this may take a few minutes')
-        feat = extract_feature(model, tqdm(data.test_loader))
-        print('feat:', feat.shape)
+    for index in range(len(models)):
+        feat = get_feat(models[index]['model_name'])
         if index == 0:
             feats = feat
         else:

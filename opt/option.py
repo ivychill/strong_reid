@@ -80,6 +80,7 @@ parser.add_argument('--lr',
                     help='initial learning_rate')
 
 parser.add_argument('--wd',
+                    type=float,
                     default=5e-4,
                     help='initial weight_decay')
 

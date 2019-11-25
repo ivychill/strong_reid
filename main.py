@@ -71,7 +71,6 @@ class Main():
             self.optimizer.step()
 
 
-
             # 评估训练耗时
             batch_time.update(time.time() - end)
             end = time.time()
@@ -90,7 +89,6 @@ class Main():
         print(log)
 
         # 记录每个epoch的结果
-        log_file = 'log/' + opt.version + '.txt'
         with open(log_file, 'a') as f:
             f.write(log + '\n')
             f.flush()
@@ -211,8 +209,8 @@ if __name__ == '__main__':
             # main = Main(model, data, optimizer, scheduler, loss)
             for epoch in range(start_epoch,  epoch + 1):
                 main.train(epoch)
-                if epoch % 5 == 0:
-                    os.makedirs('out/' + opt.version  , exist_ok=True)
+                if epoch >= 100 and epoch % 5 == 0:
+                    os.makedirs('out/' + opt.version, exist_ok=True)
                     state = {'state_dict':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
                     torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
 
