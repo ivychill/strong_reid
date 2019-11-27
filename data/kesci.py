@@ -53,13 +53,13 @@ class ImageDataset(Dataset):
 
 class Kesci(BaseImageDataset):
 
-    dataset_dir = 'plustest'
+    dataset_dir = 'match_aug'
 
     def __init__(self, root='/home/kcadmin/user/fengchen/reid/dataset', verbose=True, **kwargs):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
-        self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
-        print(self.train_dir)
+        self.train_dir = osp.join(self.dataset_dir, 'aug_train_list.txt')
+        # self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
         self.query_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
         self.gallery_dir = osp.join(self.dataset_dir, 'gallery_a')
 
@@ -144,6 +144,7 @@ class Data():
         dataset = Kesci(root=opt.data_path)
         self.num_classes = dataset.num_train_pids
         self.train_set = ImageDataset(dataset.train, train_transform)
+        self.query_set = ImageDataset(dataset.query, train_transform)
         self.test_set = ImageDataset(dataset.query + dataset.gallery, test_transform)
         self.query_paths = [ q[0] for q in dataset.query]
         self.gallery_paths = [ g[0] for g in dataset.gallery]
@@ -154,9 +155,13 @@ class Data():
             #sampler=RandomIdentitySampler_alignedreid(dataset.train, cfg.DATALOADER.NUM_INSTANCE),      # new add by gu
             num_workers=opt.num_workers)
 
-        self.test_loader = DataLoader(self.test_set, batch_size=opt.batch//2, shuffle=False, num_workers=opt.num_workers,)
+        self.query_loader = DataLoader(self.query_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
+
+        self.test_loader = DataLoader(self.test_set, batch_size=opt.batch*16, shuffle=False, num_workers=opt.num_workers,)
         print('train:', len(self.train_set))
         print('train:', len(self.train_loader))
+        print('query:', len(self.query_set))
+        print('query:', len(self.query_loader))
         print('test:', len(self.test_set))
         print('test:', len(self.test_loader))
 

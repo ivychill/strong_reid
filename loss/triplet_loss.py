@@ -147,14 +147,15 @@ class CrossEntropyLabelSmooth(nn.Module):
         return loss
 
 # Unknown Identity Rejection Loss
-class IrlLoss(nn.Module):
+class IrLoss(nn.Module):
     """
     label: 1/N
     """
-    def __init__(self, num_classes, epsilon=0.1, use_gpu=True):
-        super(CrossEntropyLabelSmooth, self).__init__()
+    def __init__(self, num_classes, use_gpu=True):
+        super(IrLoss, self).__init__()
         self.num_classes = num_classes
         self.use_gpu = use_gpu
+        self.logsoftmax = nn.LogSoftmax(dim=1)
 
     def forward(self, inputs):
         """

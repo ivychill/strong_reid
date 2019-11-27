@@ -4,7 +4,9 @@
     <list default="true" id="b137140a-7ee4-4c27-ad0a-8e5328cfd728" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/data/kesci.py" afterPath="$PROJECT_DIR$/data/kesci.py" />
-      <change beforePath="$PROJECT_DIR$/ensemble_result.py" afterPath="$PROJECT_DIR$/ensemble_result.py" />
+      <change beforePath="$PROJECT_DIR$/ensemble_result.py" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/gen_result.py" afterPath="$PROJECT_DIR$/gen_result.py" />
+      <change beforePath="$PROJECT_DIR$/loss/__init__.py" afterPath="$PROJECT_DIR$/loss/__init__.py" />
       <change beforePath="$PROJECT_DIR$/loss/triplet_loss.py" afterPath="$PROJECT_DIR$/loss/triplet_loss.py" />
       <change beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
       <change beforePath="$PROJECT_DIR$/opt/option.py" afterPath="$PROJECT_DIR$/opt/option.py" />
@@ -22,8 +24,8 @@
       <file leaf-file-name="run.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+            <state relative-caret-position="90">
+              <caret line="5" column="42" lean-forward="false" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
               <folding />
             </state>
           </provider>
@@ -32,19 +34,41 @@
       <file leaf-file-name="triplet_loss.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/loss/triplet_loss.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2826">
-              <caret line="158" column="30" lean-forward="false" selection-start-line="158" selection-start-column="30" selection-end-line="158" selection-end-column="30" />
+            <state relative-caret-position="3024">
+              <caret line="169" column="19" lean-forward="false" selection-start-line="157" selection-start-column="46" selection-end-line="169" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="90" column="22" lean-forward="false" selection-start-line="90" selection-start-column="22" selection-end-line="90" selection-end-column="22" />
+            <state relative-caret-position="556">
+              <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rejection_loss_0.120191126121720.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/log/rejection_loss_0.120191126121720.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-114">
+              <caret line="198" column="47" lean-forward="false" selection-start-line="198" selection-start-column="47" selection-end-line="198" selection-end-column="47" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gen_result.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gen_result.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="545">
+              <caret line="146" column="5" lean-forward="false" selection-start-line="146" selection-start-column="5" selection-end-line="146" selection-end-column="5" />
+              <folding>
+                <element signature="e#102#111#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -52,18 +76,20 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/loss/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-              <folding />
+            <state relative-caret-position="450">
+              <caret line="28" column="25" lean-forward="false" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
+              <folding>
+                <element signature="e#83#114#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="kesci.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="kesci.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/kesci.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1152">
-              <caret line="73" column="61" lean-forward="false" selection-start-line="73" selection-start-column="61" selection-end-line="73" selection-end-column="61" />
+            <state relative-caret-position="383">
+              <caret line="63" column="66" lean-forward="true" selection-start-line="63" selection-start-column="66" selection-end-line="63" selection-end-column="66" />
               <folding />
             </state>
           </provider>
@@ -72,50 +98,18 @@
       <file leaf-file-name="option.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/opt/option.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="12" column="69" lean-forward="false" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="69" />
+            <state relative-caret-position="522">
+              <caret line="29" column="58" lean-forward="false" selection-start-line="29" selection-start-column="58" selection-end-line="29" selection-end-column="58" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="optimizer.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/optimizer.py">
+      <file leaf-file-name="resnext101_ibn_a20191125221431.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125221431.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ensemble_result.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ensemble_result.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="954">
-              <caret line="68" column="45" lean-forward="false" selection-start-line="68" selection-start-column="45" selection-end-line="68" selection-end-column="45" />
-              <folding>
-                <element signature="e#102#111#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="network.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/model/network.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2250">
-              <caret line="134" column="53" lean-forward="false" selection-start-line="134" selection-start-column="53" selection-end-line="134" selection-end-column="53" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="metric.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/metric.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="19" column="27" lean-forward="false" selection-start-line="19" selection-start-column="27" selection-end-line="19" selection-end-column="27" />
+            <state relative-caret-position="4068">
+              <caret line="226" column="34" lean-forward="false" selection-start-line="226" selection-start-column="34" selection-end-line="226" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -132,18 +126,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>res50</find>
-      <find>model_name</find>
-      <find>se_resnext50</find>
-      <find>i</find>
-      <find>feats</find>
-      <find>model</find>
-      <find>model_path</find>
-      <find>exit</find>
-      <find>load_state_dict</find>
-      <find>load_</find>
-      <find>distmat_sum</find>
-      <find>pow</find>
       <find>Dataset statistics:</find>
       <find>=&gt; Kesci loaded</find>
       <find>cat</find>
@@ -153,15 +135,27 @@
       <find>tqdm</find>
       <find>backwo</find>
       <find>resnext101_ibn_a</find>
-      <find>out</find>
       <find>weight_decay</find>
       <find>wd</find>
       <find>json_file</find>
       <find>print</find>
-      <find>version</find>
       <find>log</find>
       <find>/home/kcadmin/user/fengchen/reid/dataset</find>
+      <find>%</find>
+      <find>train_loader</find>
+      <find>loader</find>
+      <find>model(</find>
+      <find>batch</find>
+      <find>64</find>
       <find>make_loss</find>
+      <find>reject</find>
+      <find>extract_feature</find>
+      <find>version</find>
+      <find>model_path</find>
+      <find>out</find>
+      <find>DataLoader</find>
+      <find>rejection</find>
+      <find>1.912</find>
     </findStrings>
     <replaceStrings>
       <replace>index</replace>
@@ -178,17 +172,20 @@
         <option value="$PROJECT_DIR$/opt/option_dw_se.py" />
         <option value="$PROJECT_DIR$/data/__init__.py" />
         <option value="$PROJECT_DIR$/opt/__init__.py" />
-        <option value="$PROJECT_DIR$/gen_result.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/model/backbones/densenet.py" />
         <option value="$PROJECT_DIR$/model/network.py" />
         <option value="$PROJECT_DIR$/ensemble_result.py" />
-        <option value="$PROJECT_DIR$/opt/option.py" />
         <option value="$PROJECT_DIR$/log/resnext101_ibn_a.txt" />
-        <option value="$PROJECT_DIR$/run.sh" />
+        <option value="$PROJECT_DIR$/log/resnext101_ibn_a20191125152842.txt" />
+        <option value="$PROJECT_DIR$/log/resnext101_ibn_a20191125152350.txt" />
+        <option value="$PROJECT_DIR$/loss/__init__.py" />
         <option value="$PROJECT_DIR$/loss/triplet_loss.py" />
-        <option value="$PROJECT_DIR$/data/kesci.py" />
+        <option value="$PROJECT_DIR$/opt/option.py" />
+        <option value="$PROJECT_DIR$/run.sh" />
+        <option value="$PROJECT_DIR$/gen_result.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/data/kesci.py" />
       </list>
     </option>
   </component>
@@ -213,45 +210,29 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="hua_test" type="b2602c69:ProjectViewProjectNode" />
-              <item name="hua_test" type="462c0819:PsiDirectoryNode" />
+              <item name="hua_rejection" type="b2602c69:ProjectViewProjectNode" />
+              <item name="hua_rejection" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="hua_test" type="b2602c69:ProjectViewProjectNode" />
-              <item name="hua_test" type="462c0819:PsiDirectoryNode" />
-              <item name="loss" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="hua_test" type="b2602c69:ProjectViewProjectNode" />
-              <item name="hua_test" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="hua_test" type="b2602c69:ProjectViewProjectNode" />
-              <item name="hua_test" type="462c0819:PsiDirectoryNode" />
+              <item name="hua_rejection" type="b2602c69:ProjectViewProjectNode" />
+              <item name="hua_rejection" type="462c0819:PsiDirectoryNode" />
               <item name="out" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="hua_test" type="b2602c69:ProjectViewProjectNode" />
-              <item name="hua_test" type="462c0819:PsiDirectoryNode" />
-              <item name="out" type="462c0819:PsiDirectoryNode" />
-              <item name="densenet121" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../hua_l0" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/data/kesci_dw.py" />
   </component>
   <component name="RunDashboard">
@@ -283,7 +264,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="65" y="24" width="1855" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959569" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -301,7 +282,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20105264" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20631579" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -309,116 +290,12 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/run.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loss/triplet_loss.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2826">
-          <caret line="158" column="30" lean-forward="true" selection-start-line="158" selection-start-column="30" selection-end-line="158" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loss/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/kesci.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1152">
-          <caret line="73" column="61" lean-forward="false" selection-start-line="73" selection-start-column="61" selection-end-line="73" selection-end-column="61" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opt/option.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="69" lean-forward="false" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="69" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ensemble_result.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
-          <caret line="68" column="45" lean-forward="false" selection-start-line="68" selection-start-column="45" selection-end-line="68" selection-end-column="45" />
-          <folding>
-            <element signature="e#102#111#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model/network.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2250">
-          <caret line="134" column="53" lean-forward="false" selection-start-line="134" selection-start-column="53" selection-end-line="134" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/metric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="27" lean-forward="false" selection-start-line="19" selection-start-column="27" selection-end-line="19" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1368">
-          <caret line="90" column="22" lean-forward="false" selection-start-line="90" selection-start-column="22" selection-end-line="90" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2952">
-          <caret line="178" column="68" lean-forward="false" selection-start-line="178" selection-start-column="38" selection-end-line="178" selection-end-column="68" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/kesci.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="936">
-          <caret line="61" column="28" lean-forward="false" selection-start-line="61" selection-start-column="19" selection-end-line="61" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/opt/option.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
@@ -431,25 +308,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
           <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ensemble_result.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
-          <caret line="68" column="45" lean-forward="false" selection-start-line="68" selection-start-column="45" selection-end-line="68" selection-end-column="45" />
-          <folding>
-            <element signature="e#102#111#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ensemble_result.py" />
     <entry file="file://$PROJECT_DIR$/model/network.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2250">
           <caret line="134" column="53" lean-forward="false" selection-start-line="134" selection-start-column="53" selection-end-line="134" selection-end-column="53" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -457,7 +323,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="19" column="27" lean-forward="false" selection-start-line="19" selection-start-column="27" selection-end-line="19" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -482,6 +347,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4194">
           <caret line="247" column="37" lean-forward="false" selection-start-line="247" selection-start-column="37" selection-end-line="247" selection-end-column="37" />
+          <folding>
+            <element signature="e#102#111#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -587,14 +455,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils/metric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="27" lean-forward="false" selection-start-line="19" selection-start-column="27" selection-end-line="19" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/model/backbones/senet.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2022">
@@ -609,84 +469,124 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ensemble_result.py" />
+    <entry file="file://$PROJECT_DIR$/utils/optimizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a.txt" />
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.3/system/python_stubs/-1247971764/_collections.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="45" column="8" lean-forward="false" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/sampler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="50" column="84" lean-forward="false" selection-start-line="50" selection-start-column="23" selection-end-line="50" selection-end-column="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125194936.txt" />
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125152842.txt" />
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125152350.txt" />
     <entry file="file://$PROJECT_DIR$/model/network.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2250">
-          <caret line="134" column="53" lean-forward="false" selection-start-line="134" selection-start-column="53" selection-end-line="134" selection-end-column="53" />
+        <state relative-caret-position="626">
+          <caret line="179" column="10" lean-forward="false" selection-start-line="179" selection-start-column="10" selection-end-line="179" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/metric.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="19" lean-forward="false" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125215943.txt" />
+    <entry file="file://$PROJECT_DIR$/loss/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="28" column="25" lean-forward="false" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
+          <folding>
+            <element signature="e#83#114#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loss/triplet_loss.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3024">
+          <caret line="169" column="19" lean-forward="false" selection-start-line="157" selection-start-column="46" selection-end-line="169" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ensemble_result.py">
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125221014.txt" />
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125221328.txt" />
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125161118.txt" />
+    <entry file="file://$PROJECT_DIR$/opt/option.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
-          <caret line="68" column="45" lean-forward="false" selection-start-line="68" selection-start-column="45" selection-end-line="68" selection-end-column="45" />
+        <state relative-caret-position="522">
+          <caret line="29" column="58" lean-forward="false" selection-start-line="29" selection-start-column="58" selection-end-line="29" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/rejection_loss_0.120191126121640.txt" />
+    <entry file="file://$PROJECT_DIR$/log/rejection_loss_0.1_20191126_121154.txt" />
+    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a20191125221431.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4068">
+          <caret line="226" column="34" lean-forward="false" selection-start-line="226" selection-start-column="34" selection-end-line="226" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/rejection_loss_0.120191126121720.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-114">
+          <caret line="198" column="47" lean-forward="false" selection-start-line="198" selection-start-column="47" selection-end-line="198" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="42" lean-forward="false" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen_result.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="545">
+          <caret line="146" column="5" lean-forward="false" selection-start-line="146" selection-start-column="5" selection-end-line="146" selection-end-column="5" />
           <folding>
             <element signature="e#102#111#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gen_result.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2573">
-          <caret line="243" column="43" lean-forward="false" selection-start-line="243" selection-start-column="43" selection-end-line="243" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="18" column="9" lean-forward="false" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/resnext101_ibn_a.txt" />
-    <entry file="file://$PROJECT_DIR$/run.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loss/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loss/triplet_loss.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2826">
-          <caret line="158" column="30" lean-forward="false" selection-start-line="158" selection-start-column="30" selection-end-line="158" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opt/option.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="69" lean-forward="false" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="69" />
+        <state relative-caret-position="556">
+          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/kesci.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1152">
-          <caret line="73" column="61" lean-forward="false" selection-start-line="73" selection-start-column="61" selection-end-line="73" selection-end-column="61" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="90" column="22" lean-forward="false" selection-start-line="90" selection-start-column="22" selection-end-line="90" selection-end-column="22" />
+        <state relative-caret-position="383">
+          <caret line="63" column="66" lean-forward="true" selection-start-line="63" selection-start-column="66" selection-end-line="63" selection-end-column="66" />
           <folding />
         </state>
       </provider>

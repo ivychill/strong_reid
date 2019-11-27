@@ -6,14 +6,13 @@
 
 import torch.nn.functional as F
 
-from .triplet_loss import TripletLoss, CrossEntropyLabelSmooth
+from .triplet_loss import TripletLoss, CrossEntropyLabelSmooth, IrLoss
 from .center_loss import CenterLoss
 
 
 def make_loss(opt, num_classes):    # modified by gu
 
     triplet = TripletLoss(margin=opt.MARGIN)  # triplet loss with softmargin or not
-
 
     #MODEL.IF_LABELSMOOTH == 'on':
     xent = CrossEntropyLabelSmooth(num_classes=num_classes)     # new add by luo
@@ -24,6 +23,13 @@ def make_loss(opt, num_classes):    # modified by gu
 
     return loss_func
 
+def make_rejection_loss(opt, num_classes):
+    xent = IrLoss(num_classes=num_classes)
+
+    def loss_func(score):
+        return xent(score)
+
+    return loss_func
 
 def make_loss_with_center(opt, num_classes):    # modified by gu
     if opt.MODEL.NAME == 'resnet18' or opt.MODEL.NAME == 'resnet34':

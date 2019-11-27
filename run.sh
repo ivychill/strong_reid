@@ -3,15 +3,11 @@
 case $1 in
 
     train)
-        python main.py --gpus=3 --batch=64 --wd 1e-3
+        python main.py --gpus=2 --batch=64
         ;;
 
     test)
-        python gen_result.py --gpus=3
-        ;;
-
-    ensemble)
-        python ensemble_result.py --gpus=3
+        python gen_result.py
         ;;
 
     *)

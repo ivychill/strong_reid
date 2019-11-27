@@ -11,7 +11,7 @@ from opt import opt
 from model import build_model
 from data import Data
 from utils import make_optimizer, AverageMeter, WarmupMultiStepLR,extract_feature
-from loss import make_loss
+from loss import make_loss, make_rejection_loss
 import argparse
 from torch.backends import cudnn
 import numpy as np
@@ -19,13 +19,15 @@ import random
 import time
 from tqdm import tqdm
 import json
+import itertools
 from utils.re_ranking import reRanking
 
 
 class Main():
 
-    def __init__(self, opt, model, data, optimizer, scheduler, loss, device="cuda"):
+    def __init__(self, opt, model, data, optimizer, scheduler, loss, rejection_loss=None, device="cuda"):
         self.train_loader = data.train_loader
+        self.query_loader = data.query_loader
         self.test_loader = data.test_loader
         self.gallery_paths = data.gallery_paths
         self.query_paths = data.query_paths
@@ -37,6 +39,7 @@ class Main():
             self.model = model.to(self.device)
 
         self.loss = loss
+        self.rejection_loss = rejection_loss
         self.optimizer = optimizer
         self.scheduler = scheduler
     
@@ -50,17 +53,41 @@ class Main():
         end = time.time()
         lr = self.scheduler.get_lr()[0]
 
-        for batch, (inputs, labels) in enumerate(self.train_loader):
-            # # 评估图片读取耗时
-            # data_time.update(time.time() - end)
+        # for batch, (inputs, labels) in enumerate(self.train_loader):
+        # query data for unknown identity rejection
+        for batch, (data, rejection_data) in enumerate(itertools.zip_longest(self.train_loader, self.query_loader)):
+            loss = 0
+            if data is not None:
+                inputs, labels = data
+                # 转cuda
+                inputs = inputs.to(self.device) if torch.cuda.device_count() >= 1 else inputs
+                labels = labels.to(self.device) if torch.cuda.device_count() >= 1 else labels
 
-            # 转cuda
-            inputs = inputs.to(self.device) if torch.cuda.device_count() >= 1 else inputs
-            labels = labels.to(self.device) if torch.cuda.device_count() >= 1 else labels
-            
+                score, outputs = self.model(inputs)
+                traditional_loss = self.loss(score, outputs, labels)
+                loss += traditional_loss
 
-            score, outputs = self.model(inputs)
-            loss = self.loss(score, outputs, labels)
+            if rejection_data is not None:
+                rejection_inputs, rejection_labels = rejection_data
+                # 转cuda
+                rejection_inputs = rejection_inputs.to(self.device) if torch.cuda.device_count() >= 1 else rejection_inputs
+                rejection_labels = rejection_labels.to(self.device) if torch.cuda.device_count() >= 1 else rejection_labels
+                score, outputs = self.model(inputs)
+                rejection_loss = self.rejection_loss(score)
+                loss += rejection_loss * 0.1
+
+            # L0
+            lambda0 = 5e-9
+            all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
+            l0_regularization = lambda0 * torch.norm(all_params, 0)
+            loss += l0_regularization
+
+            # L1
+            lambda1 = 1e-6
+            all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
+            l1_regularization = lambda1 * torch.norm(all_params, 1)
+            loss += l1_regularization
+
             losses.update(loss.item(), inputs.size(0))
 
             prec = (score.max(1)[1] == labels).float().mean()
@@ -69,7 +96,6 @@ class Main():
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-
 
             # 评估训练耗时
             batch_time.update(time.time() - end)
@@ -163,8 +189,6 @@ class Main():
             json.dump(results, fp)
 
 
-        
-
 if __name__ == '__main__':
         # 随机种子
     np.random.seed(2019)
@@ -187,11 +211,12 @@ if __name__ == '__main__':
     model = build_model(opt, data.num_classes)
     optimizer = make_optimizer(opt, model)
     loss = make_loss(opt, data.num_classes)
+    rejection_loss = make_rejection_loss(opt, data.num_classes)
 
     # WARMUP_FACTOR: 0.01
     # WARMUP_ITERS: 10
     scheduler = WarmupMultiStepLR(optimizer, opt.steps, 0.1, 0.01, 10, "linear")
-    main = Main(opt, model, data, optimizer, scheduler, loss)
+    main = Main(opt, model, data, optimizer, scheduler, loss, rejection_loss)
 
     if opt.mode == 'train':
 
@@ -216,7 +241,7 @@ if __name__ == '__main__':
 
         for epoch in range(start_epoch, epoch + 1):
             main.train(epoch)
-            if epoch % 5 == 0:
+            if epoch >= 100 and epoch % 5 == 0:
                 os.makedirs('out/'+ opt.version, exist_ok=True)
                 state = {'state_dict':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
                 torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))

@@ -22,12 +22,12 @@ parser.add_argument('--resume',
                     help='resume from a ckpt')
 
 parser.add_argument('--version', 
-                    default='resnext101_ibn_a',
+                    default='rejection_loss_0.1',
                     help='version')
 
 parser.add_argument('--weight', 
                     type= str, 
-                    default='out/resnext101_ibn_a/model_140.pth',
+                    default='out/resnext101_ibn_a/model_180.pth',
                     help='weight')
 
 parser.add_argument('--model_name',
