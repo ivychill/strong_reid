@@ -10,7 +10,7 @@ import torch
 from opt import opt
 from model import build_model
 from data import Data
-from utils import make_optimizer, AverageMeter, WarmupMultiStepLR,extract_feature
+from utils import make_optimizer, AverageMeter, WarmupMultiStepLR, extract_feature
 from loss import make_loss
 import argparse
 from torch.backends import cudnn
@@ -47,7 +47,8 @@ def gen_feat(opt, model_, data):
     print(opt,'\n')
     if opt.model_name == 'se_resnext50':
         model = build_model(opt, 2432)
-        model.load_state_dict(torch.load(opt.weight))
+        # model.load_state_dict(torch.load(opt.weight))
+        model.load_param(opt.weight)
     else:
         model = build_model(opt, data.num_classes)
         model.load_state_dict(torch.load(opt.weight)['state_dict'])
@@ -73,7 +74,7 @@ def get_feat(model):
     if model['model_name'] == 'densenet121':
         query_feature = result['query_f']
         gallery_feature = result['gallery_f']
-        result = np.append(query_feature, gallery_feature, axis=0)*0.5
+        result = np.append(query_feature, gallery_feature, axis=0)
     else:
         result = result['test_f']
     result = torch.from_numpy(result)
@@ -82,9 +83,6 @@ def get_feat(model):
 
 # 当len(models)=1时，就是单模型
 def ensemble(models):
-    for model in models:
-        feat = gen_feat(opt, model, data)
-
     feats = []
     for index, model in enumerate(models):
         feat = get_feat(model)
@@ -123,40 +121,45 @@ if __name__ == '__main__':
         f.write(str(opt) + '\n')
         f.flush()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     cudnn.benchmark = False
 
     data = Data()
 
     # models =  [
-    #     {'dir': 'mgn',
-    #      'model_name': 'resnext101_ibn_a'},
+    #         {'dir': 'se_resnext50',
+    #          'model_name': 'se_resnext50',
+    #          'model_path': '/home/kcadmin/.torch/models/se_resnext50_32x4d-a260b3a4.pth',
+    #          'weight': 'out/se_resnext50/model_829.pth'},
     # ]
+    #
+    # for model in models:
+    #     feat = gen_feat(opt, model, data)
 
-    models = [
-        # {'dir': 'se_resnext50',
-        #  'model_name': 'se_resnext50',
-        #  'model_path': '/home/kcadmin/.torch/models/se_resnext50_32x4d-a260b3a4.pth',
-        #  'weight': 'out/se_resnext50/model_180.pth'},
-        {'dir': 'rejection_loss_0.1',
-         'model_name': 'resnext101_ibn_a',
-         'model_path': '/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
-         'weight': 'out/rejection_loss_0.1/model_250.pth'},
-        # {'dir': 'mgn',
-        #  'model_name': 'resnext101_ibn_a'},
+    models =  [
+        {'dir': 'pcb_2',
+         'model_name': 'densenet121'},
+        {'dir': 'pcb_3',
+         'model_name': 'densenet121'},
+        {'dir': 'pcb_4',
+         'model_name': 'densenet121'},
+        {'dir': 'pcb_6',
+         'model_name': 'densenet121'},
     ]
 
     # models =  [
     #     {'dir': 'se_resnext50',
     #      'model_name': 'se_resnext50',
     #      'model_path': '/home/kcadmin/.torch/models/se_resnext50_32x4d-a260b3a4.pth',
-    #      'weight': 'out/se_resnext50/model_180.pth'},
+    #      'weight': 'out/se_resnext50/model_829.pth'},
     #     {'dir': 'resnext101_ibn_a',
     #      'model_name': 'resnext101_ibn_a',
     #      'model_path': '/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
-    #      'weight': 'out/resnext101_ibn_a/model_140.pth'},
-    #     {'dir': 'densenet121',
-    #      'model_name': 'densenet121'},
+    #      'weight': 'out/resnext101_ibn_a/model_839.pth'},
+    #     {'dir': 'mgn',
+    #      'model_name': 'resnext101_ibn_a'},
+    #     # {'dir': 'densenet121',
+    #     #  'model_name': 'densenet121'},
     # ]
 
     ensemble(models)
