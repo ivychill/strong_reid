@@ -22,12 +22,12 @@ parser.add_argument('--resume',
                     help='resume from a ckpt')
 
 parser.add_argument('--version', 
-                    default='resnext101_ibn_a_dw',
+                    default='2loader',
                     help='version')
 
 parser.add_argument('--weight', 
                     type= str, 
-                    default='out/resnext101_ibn_a_dw/model_120.pth',
+                    default='out/resnext101_ibn_a/model_180.pth',
                     help='weight')
 
 parser.add_argument('--model_name',
@@ -63,7 +63,7 @@ parser.add_argument('--instance',
                     help='instance for each id in a batch')
 
 parser.add_argument('--model_path',
-                    default='/home/kc/.torch/models/resnext101_ibn_a.pth',
+                    default='/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
                     help='pretrained model ')
 
 parser.add_argument('--MARGIN',
@@ -80,6 +80,7 @@ parser.add_argument('--lr',
                     help='initial learning_rate')
 
 parser.add_argument('--wd',
+                    type=float,
                     default=5e-4,
                     help='initial weight_decay')
 

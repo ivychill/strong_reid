@@ -10,11 +10,24 @@ from .triplet_loss import TripletLoss, CrossEntropyLabelSmooth, IrLoss
 from .center_loss import CenterLoss
 
 
+def make_softmax_loss(opt, num_classes):    # modified by gu
+    xent = CrossEntropyLabelSmooth(num_classes=num_classes)     # new add by luo
+    print("label smooth on, numclasses:", num_classes)
+    def loss_func(score, feat, target):
+        return xent(score, target)
+
+    return loss_func
+
+def make_triplet_loss(opt, num_classes):
+    triplet = TripletLoss(margin=opt.MARGIN)  # triplet loss with softmargin or not
+    def loss_func(score, feat, target):
+        return triplet(feat, target)[0]
+
+    return loss_func
+
 def make_loss(opt, num_classes):    # modified by gu
 
     triplet = TripletLoss(margin=opt.MARGIN)  # triplet loss with softmargin or not
-
-    #MODEL.IF_LABELSMOOTH == 'on':
     xent = CrossEntropyLabelSmooth(num_classes=num_classes)     # new add by luo
     print("label smooth on, numclasses:", num_classes)
 

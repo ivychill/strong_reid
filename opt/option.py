@@ -10,7 +10,7 @@ import argparse
 parser = argparse.ArgumentParser(description='reid option')
 
 parser.add_argument('--data_path',
-                    default="/home/kcadmin/user/fengchen/reid/dataset",
+                    default="../dataset",
                     help='path of data')
 parser.add_argument('--gpus', 
                     default="0", 
@@ -22,7 +22,7 @@ parser.add_argument('--resume',
                     help='resume from a ckpt')
 
 parser.add_argument('--version', 
-                    default='rejection_loss_0.1',
+                    default='initial',
                     help='version')
 
 parser.add_argument('--weight', 

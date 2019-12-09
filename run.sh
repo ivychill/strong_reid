@@ -3,11 +3,19 @@
 case $1 in
 
     train)
-        python main.py --gpus=2 --batch=64
+        python main.py --gpus=0 --batch=64
         ;;
 
-    test)
+    feat)
+        python gen_mat.py
+        ;;
+
+    json)
         python gen_result.py
+        ;;
+
+    mmd)
+        python mmd.py
         ;;
 
     *)

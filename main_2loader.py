@@ -10,8 +10,9 @@ import torch
 from opt import opt
 from model import build_model
 from data import Data
-from utils import make_optimizer, AverageMeter, WarmupMultiStepLR,extract_feature
-from loss import make_loss
+from utils import make_optimizer, AverageMeter, WarmupMultiStepLR, extract_feature
+from loss import make_triplet_loss
+from loss import make_softmax_loss
 import argparse
 from torch.backends import cudnn
 import numpy as np
@@ -19,14 +20,15 @@ import random
 import time
 from tqdm import tqdm
 import json
+import itertools
 from utils.re_ranking import reRanking
-from log import *
 
 
 class Main():
 
-    def __init__(self, opt, model, data, optimizer, scheduler, loss, device="cuda"):
-        self.train_loader = data.train_loader
+    def __init__(self, opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, device="cuda"):
+        self.softmax_train_loader = data.softmax_train_loader
+        self.triplet_train_loader = data.triplet_train_loader
         self.test_loader = data.test_loader
         self.gallery_paths = data.gallery_paths
         self.query_paths = data.query_paths
@@ -37,7 +39,8 @@ class Main():
                 model = torch.nn.DataParallel(model)
             self.model = model.to(self.device)
 
-        self.loss = loss
+        self.softmax_loss = softmax_loss
+        self.triplet_loss = triplet_loss
         self.optimizer = optimizer
         self.scheduler = scheduler
     
@@ -51,28 +54,43 @@ class Main():
         end = time.time()
         lr = self.scheduler.get_lr()[0]
 
-        for batch, (inputs, labels) in enumerate(self.train_loader):
-            # # 评估图片读取耗时
-            # data_time.update(time.time() - end)
+        # for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
+        for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
+            loss = 0
+            if softmax_data is not None:
+                softmax_inputs, softmax_labels = softmax_data
+                # 转cuda
+                softmax_inputs = softmax_inputs.to(self.device) if torch.cuda.device_count() >= 1 else softmax_inputs
+                softmax_labels = softmax_labels.to(self.device) if torch.cuda.device_count() >= 1 else softmax_labels
 
-            # 转cuda
-            inputs = inputs.to(self.device) if torch.cuda.device_count() >= 1 else inputs
-            labels = labels.to(self.device) if torch.cuda.device_count() >= 1 else labels
-            
+                softmax_score, softmax_outputs = self.model(softmax_inputs)
+                traditional_loss = self.softmax_loss(softmax_score, softmax_outputs, softmax_labels)
+                loss += traditional_loss
 
-            score, outputs = self.model(inputs)
-            loss = self.loss(score, outputs, labels)
+                losses.update(loss.item(), softmax_inputs.size(0))
+                prec = (softmax_score.max(1)[1] == softmax_labels).float().mean()
+                acc.update(prec, softmax_inputs.size(0))
 
-            # if opt.l0:
-            #     lambda0 = 5e-9
-            #     all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
-            #     l0_regularization = lambda0 * torch.norm(all_params, 0)
-            #     loss += l0_regularization
+            if triplet_data is not None:
+                triplet_inputs, triplet_labels = triplet_data
+                # 转cuda
+                triplet_inputs = triplet_inputs.to(self.device) if torch.cuda.device_count() >= 1 else triplet_inputs
+                triplet_labels = triplet_labels.to(self.device) if torch.cuda.device_count() >= 1 else triplet_labels
+                triplet_score, triplet_outputs = self.model(triplet_inputs)
+                triplet_loss = self.triplet_loss(triplet_score, triplet_outputs, triplet_labels)
+                loss += triplet_loss
 
-            losses.update(loss.item(), inputs.size(0))
-
-            prec = (score.max(1)[1] == labels).float().mean()
-            acc.update(prec, inputs.size(0))
+            # # L0
+            # lambda0 = 5e-9
+            # all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
+            # l0_regularization = lambda0 * torch.norm(all_params, 0)
+            # loss += l0_regularization
+            #
+            # # L1
+            # lambda1 = 1e-6
+            # all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
+            # l1_regularization = lambda1 * torch.norm(all_params, 1)
+            # loss += l1_regularization
 
             self.optimizer.zero_grad()
             loss.backward()
@@ -84,16 +102,21 @@ class Main():
 
             # 打印耗时与结果
             if (batch+1) % 10 == 0:
-                logger.debug('Epoch: [{}][{}/{}]\t'
+                print('Epoch: [{}][{}/{}]\t'
                       'Base_lr: [{:.2e}]\t'
                       'Time: ({batch_time.avg:.3f})\t'
                       'Loss_val: {loss.val:.4f}  (Loss_avg: {loss.avg:.4f})\t'
                       'Accuray_val: {acc.val:.3f}  (Accuray_avg: {acc.avg:.3f})'.format(
-                       epoch, batch+1, len(self.train_loader), lr, batch_time=batch_time, loss=losses, acc=acc))
+                       epoch, batch+1, len(self.softmax_train_loader), lr, batch_time=batch_time, loss=losses, acc=acc))
 
         # 每个epoch的结果
-        logger.info('Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.3f}\t* Loss {loss.avg:.3f}'.format(epoch, lr, acc=acc, loss=losses))
+        log = 'Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.3f}\t* Loss {loss.avg:.3f}'.format(epoch, lr, acc=acc, loss=losses)
+        print(log)
 
+        # 记录每个epoch的结果
+        with open(log_file, 'a') as f:
+            f.write(log + '\n')
+            f.flush()
 
     def pre(self):
 
@@ -120,8 +143,32 @@ class Main():
         print('re_ranking ...')
         distmat_rk = reRanking(qf, gf, 7, 3, 0.85)
         self.writeResult(distmat_rk, json_file_rk)
+
+        # print('distmat:', distmat.shape)
+        # index = np.argsort(distmat)  # from small to large
+        # max_index = index[:, :200]
+        # print(max_index.shape)
+        #
+        # # Visualize the rank result
+        # results = {}
+        # json_file = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '.json'
+        # json_file_rk = 'results/result_' + time.strftime("%Y%m%d%H%M%S") + '_rk.json'
+        # for i in range(len(self.query_paths)):
+        #     query_name = self.query_paths[i].split('/')[-1]
+        #     index_mask = max_index[i]
+        #     gallery_name = [self.gallery_paths[k].split('/')[-1] for k in index_mask]
+        #     #print(index_mask)
+        #
+        #     results[query_name] = gallery_name
+        #     #print(res)
+        #
+        # with open(json_file, 'w', encoding='utf-8') as fp:
+        #     json.dump(results, fp)
+
         print('Time cost is: {:.2f} s'.format(time.time()-t1))
         print('over!')
+        # print(json_file)
+        # print(max_index)
 
     def writeResult(self,distmat,json_file):
         print('distmat:', distmat.shape)
@@ -142,20 +189,16 @@ class Main():
 
 
 if __name__ == '__main__':
-    #### log ####
-    time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-    log_dir = os.path.join(os.path.expanduser('./log'), time_str)
-    if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
-        os.makedirs(log_dir)
-    set_logger(logger, log_dir)
-
-    #### seed ####
+        # 随机种子
     np.random.seed(2019)
     torch.manual_seed(2019)
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    log_file = 'log/' + opt.version + '.txt'
+    print('********* opt config *********')
+    print(opt,'\n')
+
+    log_file = 'log/' + opt.version + time.strftime("%Y%m%d%H%M%S") + '.txt'
     with open(log_file, 'a') as f:
         f.write(str(opt) + '\n')
         f.flush()
@@ -166,12 +209,15 @@ if __name__ == '__main__':
     data = Data()
     model = build_model(opt, data.num_classes)
     optimizer = make_optimizer(opt, model)
-    loss = make_loss(opt, data.num_classes)
+    # loss = make_loss(opt, data.num_classes)
+    # rejection_loss = make_rejection_loss(opt, data.num_classes)
+    softmax_loss = make_softmax_loss(opt, data.num_classes)
+    triplet_loss = make_triplet_loss(opt, data.num_classes)
 
     # WARMUP_FACTOR: 0.01
     # WARMUP_ITERS: 10
     scheduler = WarmupMultiStepLR(optimizer, opt.steps, 0.1, 0.01, 10, "linear")
-    main = Main(opt, model, data, optimizer, scheduler, loss)
+    main = Main(opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss)
 
     if opt.mode == 'train':
 
@@ -183,13 +229,13 @@ if __name__ == '__main__':
         if opt.resume:
             ckpt = torch.load(opt.resume)
             start_epoch = ckpt['epoch']
-            logger.info('resume from the epoch: ', start_epoch)
+            print('resume from the epoch: ', start_epoch)
             model.load_state_dict(ckpt['state_dict'])
             optimizer.load_state_dict(ckpt['optimizer'])
             # main = Main(model, data, optimizer, scheduler, loss)
             for epoch in range(start_epoch,  epoch + 1):
                 main.train(epoch)
-                if epoch % 5 == 0:
+                if epoch >= 100 and epoch % 5 == 0:
                     os.makedirs('out/' + opt.version, exist_ok=True)
                     state = {'state_dict':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
                     torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
@@ -202,6 +248,6 @@ if __name__ == '__main__':
                 torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
 
     if opt.mode == 'pre':
-        logger.info('predict')
+        print('predict')
         model.load_state_dict(torch.load(opt.weight)['state_dict'])
         main.pre()
