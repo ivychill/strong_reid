@@ -222,7 +222,7 @@ if __name__ == '__main__':
     if opt.mode == 'train':
 
         # 总迭代次数
-        epoch = 250
+        epoch = 200
         start_epoch = 1
 
         # 断点加载训练

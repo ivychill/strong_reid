@@ -46,10 +46,13 @@ class BaseImageDataset(BaseDataset):
     Base class of image reid dataset
     """
 
-    def print_dataset_statistics(self, train, query, gallery):
+    # def print_dataset_statistics(self, train, query, gallery):
+    def print_dataset_statistics(self, train, query, gallery, train_2=None):
         num_train_pids, num_train_imgs = self.get_imagedata_info(train)
         num_query_pids, num_query_imgs = self.get_imagedata_info(query)
         num_gallery_pids, num_gallery_imgs = self.get_imagedata_info(gallery)
+        if train_2 is not None:
+            num_train_2_pids, num_train_2_imgs = self.get_imagedata_info(train_2)
 
         print("Dataset statistics:")
         print("  ----------------------------------------")
@@ -58,6 +61,8 @@ class BaseImageDataset(BaseDataset):
         print("  train    | {:5d} | {:8d}".format(num_train_pids, num_train_imgs))
         print("  query    | {:5d} | {:8d}".format(num_query_pids, num_query_imgs))
         print("  gallery  | {:5d} | {:8d}".format(num_gallery_pids, num_gallery_imgs))
+        if train_2 is not None:
+            print("  train_2  | {:5d} | {:8d}".format(num_train_2_pids, num_train_2_imgs))
         print("  ----------------------------------------")
 
 

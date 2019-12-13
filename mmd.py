@@ -112,9 +112,9 @@ def mmd(source_feature, target_feature):
         np.random.shuffle(source_feature)
         np.random.shuffle(target_feature)
         total_s_t = 0
-        for index in range(iter_num - 1):
-            source_feat = source_feature[(index + 1) * opt.batch:(index + 2) * opt.batch]
-            target_feat = target_feature[(index + 1) * opt.batch:(index + 2) * opt.batch]
+        for index in range(iter_num):
+            source_feat = source_feature[(index) * opt.batch:(index + 1) * opt.batch]
+            target_feat = target_feature[(index) * opt.batch:(index + 1) * opt.batch]
             s_t = float(mmd_loss(torch.from_numpy(source_feat), torch.from_numpy(target_feat)))
             logger.debug('run {} index {}: {:.4f}'.format(run, index, s_t))
             total_s_t += s_t
@@ -149,9 +149,9 @@ if __name__ == '__main__':
              'weight': 'out/2loader/model_180.pth'}
 
     opt.batch = 256
-    features = gen_feats(opt, model, data)
+    # features = gen_feats(opt, model, data)
     features = get_feats(model)
-    iter_num = features[2].shape[0] // opt.batch
+    iter_num = features[1].shape[0] // opt.batch
     mmd_loss = MMD_loss()
 
     for feat in features:

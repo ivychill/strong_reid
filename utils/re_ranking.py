@@ -24,6 +24,7 @@ Minibatch: avaliable when 'MemorySave' is 'True'
 
 import numpy as np
 import torch
+from log import logger
 
 
 def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_local=False):
@@ -34,7 +35,8 @@ def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_lo
         original_dist = local_distmat
     else:
         feat = torch.cat([probFea,galFea])
-        print('using GPU to compute original distance')
+        feat.cuda()
+        logger.debug('using GPU to compute original distance')
         distmat = torch.pow(feat,2).sum(dim=1, keepdim=True).expand(all_num,all_num) + \
                       torch.pow(feat, 2).sum(dim=1, keepdim=True).expand(all_num, all_num).t()
         distmat.addmm_(1,-2,feat,feat.t())
@@ -42,12 +44,15 @@ def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_lo
         del feat
         if not local_distmat is None:
             original_dist = original_dist + local_distmat
+
+    logger.debug('original_dist shape: {}'.format(original_dist.shape))
+
     gallery_num = original_dist.shape[0]
     original_dist = np.transpose(original_dist / np.max(original_dist, axis=0))
     V = np.zeros_like(original_dist).astype(np.float16)
     initial_rank = np.argsort(original_dist).astype(np.int32)
 
-    print('starting re_ranking')
+    logger.debug('starting re_ranking')
     for i in range(all_num):
         # k-reciprocal neighbors
         forward_k_neigh_index = initial_rank[i, :k1 + 1]
@@ -70,6 +75,9 @@ def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_lo
         weight = np.exp(-original_dist[i, k_reciprocal_expansion_index])
         V[i, k_reciprocal_expansion_index] = weight / np.sum(weight)
     original_dist = original_dist[:query_num, ]
+
+    logger.debug('k1 reciprocal end')
+
     if k2 != 1:
         V_qe = np.zeros_like(V, dtype=np.float16)
         for i in range(all_num):
@@ -80,6 +88,8 @@ def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_lo
     invIndex = []
     for i in range(gallery_num):
         invIndex.append(np.where(V[:, i] != 0)[0])
+
+    logger.debug('k2 local query expansion end')
 
     jaccard_dist = np.zeros_like(original_dist, dtype=np.float16)
 
@@ -98,4 +108,3 @@ def reRanking(probFea, galFea, k1, k2, lambda_value, local_distmat=None, only_lo
     del jaccard_dist
     final_dist = final_dist[:query_num, query_num:]
     return final_dist
-

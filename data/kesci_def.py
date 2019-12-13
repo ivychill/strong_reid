@@ -58,61 +58,37 @@ class Kesci(BaseImageDataset):
     def __init__(self, root, verbose=True, **kwargs):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
-        # self.train_dir = osp.join(self.dataset_dir, 'aug_train_list.txt')
-        self.softmax_train_dir = osp.join(self.dataset_dir, 'softmax_train.txt')
-        self.triplet_train_dir = osp.join(self.dataset_dir, 'triplet_with_query_train.txt')
+        self.train_dir = osp.join(self.dataset_dir, 'train_list.txt')
         # self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
-        self.query_dir = osp.join(self.dataset_dir, 'query_b_list.txt')
-        self.gallery_dir = osp.join(self.dataset_dir, 'gallery_b')
-
-        self.query_a_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
-        self.gallery_a_dir = osp.join(self.dataset_dir, 'gallery_a')
+        self.query_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
+        self.gallery_dir = osp.join(self.dataset_dir, 'gallery_a')
 
         self._check_before_run()
 
-        # train = self._process_train(self.train_dir, relabel=True)
-        softmax_train = self._process_train(self.softmax_train_dir, relabel=True)
-        triplet_train = self._process_train(self.triplet_train_dir, relabel=True)
+        train = self._process_train(self.train_dir, relabel=True)
         query = self._process_train(self.query_dir, relabel=True)
         gallery = self._process_test(self.gallery_dir)
-        query_a = self._process_train(self.query_a_dir, relabel=True)
-        gallery_a = self._process_test(self.gallery_a_dir)
 
         if verbose:
-            # self.print_dataset_statistics(train, query, gallery)
-            self.print_dataset_statistics(softmax_train, query, gallery, triplet_train)
+            self.print_dataset_statistics(train, query, gallery)
 
-        # self.train = train
-        self.softmax_train = softmax_train
-        self.triplet_train = triplet_train
+        self.train = train
         self.query = query
         self.gallery = gallery
 
-        self.query_a = query_a
-        self.gallery_a = gallery_a
+        self.num_train_pids, self.num_train_imgs = self.get_imagedata_info(self.train)
 
-        # self.num_train_pids, self.num_train_imgs = self.get_imagedata_info(self.train)
-        self.num_train_pids, self.num_train_imgs = self.get_imagedata_info(self.softmax_train)
 
     def _check_before_run(self):
         """Check if all files are available before going deeper"""
         if not osp.exists(self.dataset_dir):
             raise RuntimeError("'{}' is not available".format(self.dataset_dir))
-        # if not osp.exists(self.train_dir):
-        #     raise RuntimeError("'{}' is not available".format(self.train_dir))
-        if not osp.exists(self.softmax_train_dir):
-            raise RuntimeError("'{}' is not available".format(self.softmax_train_dir))
-        if not osp.exists(self.triplet_train_dir):
-            raise RuntimeError("'{}' is not available".format(self.triplet_train_dir))
+        if not osp.exists(self.train_dir):
+            raise RuntimeError("'{}' is not available".format(self.train_dir))
         if not osp.exists(self.query_dir):
             raise RuntimeError("'{}' is not available".format(self.query_dir))
         if not osp.exists(self.gallery_dir):
             raise RuntimeError("'{}' is not available".format(self.gallery_dir))
-
-        if not osp.exists(self.query_a_dir):
-            raise RuntimeError("'{}' is not available".format(self.query_a_dir))
-        if not osp.exists(self.gallery_a_dir):
-            raise RuntimeError("'{}' is not available".format(self.gallery_a_dir))
             
     def _process_test(self, dir_path):
         dataset = []
@@ -166,37 +142,27 @@ class Data():
 
         dataset = Kesci(root=opt.data_path)
         self.num_classes = dataset.num_train_pids
-        # self.train_set = ImageDataset(dataset.train, train_transform)
-        self.softmax_train_set = ImageDataset(dataset.softmax_train, train_transform)
-        self.triplet_train_set = ImageDataset(dataset.triplet_train, train_transform)
-        self.query_set = ImageDataset(dataset.query, train_transform)
-        self.query_a_set = ImageDataset(dataset.query_a, train_transform)
+        self.train_set = ImageDataset(dataset.train, train_transform)
+        # TODO: query_set switch between train_transform and test_transform
+        self.query_set = ImageDataset(dataset.query, test_transform)
+        self.gallery_set = ImageDataset(dataset.gallery, test_transform)
+
         self.test_set = ImageDataset(dataset.query + dataset.gallery, test_transform)
-        self.test_a_set = ImageDataset(dataset.query_a + dataset.gallery_a, test_transform)
         self.query_paths = [ q[0] for q in dataset.query]
-        self.query_a_paths = [ q[0] for q in dataset.query_a]
         self.gallery_paths = [ g[0] for g in dataset.gallery]
 
-        # self.triplet_train_loader = DataLoader(
-        #     self.triplet_train_set, batch_size=opt.batch,
-        #     sampler=RandomIdentitySampler(dataset.train, opt.batch, opt.instance),
-        #     #sampler=RandomIdentitySampler_alignedreid(dataset.train, cfg.DATALOADER.NUM_INSTANCE),      # new add by gu
-        #     num_workers=opt.num_workers)
-        self.softmax_train_loader = DataLoader(self.softmax_train_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
-        self.triplet_train_loader = DataLoader(
-            self.triplet_train_set, batch_size=opt.batch,
-            sampler=RandomIdentitySampler(dataset.triplet_train, opt.batch, opt.instance),
+        self.train_loader = DataLoader(
+            self.train_set, batch_size=opt.batch,
+            sampler=RandomIdentitySampler(dataset.train, opt.batch, opt.instance),
+            #sampler=RandomIdentitySampler_alignedreid(dataset.train, cfg.DATALOADER.NUM_INSTANCE),      # new add by gu
             num_workers=opt.num_workers)
-        self.query_loader = DataLoader(self.query_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
-        self.query_a_loader = DataLoader(self.query_a_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
+        # TODO: shuffle switch between True and False
+        self.query_loader = DataLoader(self.query_set, batch_size=opt.batch*16, shuffle=True, num_workers=opt.num_workers,)
+        self.gallery_loader = DataLoader(self.gallery_set, batch_size=opt.batch*16, shuffle=True, num_workers=opt.num_workers,)
+
         self.test_loader = DataLoader(self.test_set, batch_size=opt.batch*16, shuffle=False, num_workers=opt.num_workers,)
-        self.test_a_loader = DataLoader(self.test_a_set, batch_size=opt.batch*16, shuffle=False, num_workers=opt.num_workers,)
-        # print('train:', len(self.train_set))
-        # print('train:', len(self.train_loader))
-        print('softmax_train:', len(self.softmax_train_set))
-        print('softmax_train:', len(self.softmax_train_loader))
-        print('triplet_train:', len(self.triplet_train_set))
-        print('triplet_train:', len(self.triplet_train_loader))
+        print('train:', len(self.train_set))
+        print('train:', len(self.train_loader))
         print('query:', len(self.query_set))
         print('query:', len(self.query_loader))
         print('test:', len(self.test_set))

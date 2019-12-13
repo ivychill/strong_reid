@@ -88,11 +88,15 @@ class Main():
                       'Base_lr: [{:.2e}]\t'
                       'Time: ({batch_time.avg:.3f})\t'
                       'Loss_val: {loss.val:.4f}  (Loss_avg: {loss.avg:.4f})\t'
-                      'Accuray_val: {acc.val:.3f}  (Accuray_avg: {acc.avg:.3f})'.format(
+                      'Accuray_val: {acc.val:.4f}  (Accuray_avg: {acc.avg:.4f})'.format(
                        epoch, batch+1, len(self.train_loader), lr, batch_time=batch_time, loss=losses, acc=acc))
 
         # 每个epoch的结果
-        logger.info('Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.3f}\t* Loss {loss.avg:.3f}'.format(epoch, lr, acc=acc, loss=losses))
+        log_text = 'Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.3f}\t* Loss {loss.avg:.3f}'.format(epoch, lr, acc=acc, loss=losses)
+        logger.info(log_text)
+        with open(log_file, 'a') as f:
+            f.write(log_text + '\n')
+            f.flush()
 
 
     def pre(self):
@@ -142,20 +146,19 @@ class Main():
 
 
 if __name__ == '__main__':
-    #### log ####
-    time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-    log_dir = os.path.join(os.path.expanduser('./log'), time_str)
-    if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
-        os.makedirs(log_dir)
-    set_logger(logger, log_dir)
-
     #### seed ####
     np.random.seed(2019)
     torch.manual_seed(2019)
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    log_file = 'log/' + opt.version + '.txt'
+    #### log ####
+    time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+    log_dir = os.path.join(os.path.expanduser('./log'), time_str)
+    if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
+        os.makedirs(log_dir)
+    set_logger(logger, log_dir)
+    log_file = os.path.join(log_dir, opt.version + '.txt')
     with open(log_file, 'a') as f:
         f.write(str(opt) + '\n')
         f.flush()
@@ -176,7 +179,7 @@ if __name__ == '__main__':
     if opt.mode == 'train':
 
         # 总迭代次数
-        epoch = 250
+        epoch = 200
         start_epoch = 1
 
         # 断点加载训练

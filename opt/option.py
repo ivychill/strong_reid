@@ -9,9 +9,13 @@ import argparse
 
 parser = argparse.ArgumentParser(description='reid option')
 
+parser.add_argument('--fp16', action='store_true',
+                    help='use float16 instead of float32, which will save about 50% memory' )
+
 parser.add_argument('--data_path',
                     default="../dataset",
                     help='path of data')
+
 parser.add_argument('--gpus', 
                     default="0", 
                     type=str, 
@@ -22,7 +26,7 @@ parser.add_argument('--resume',
                     help='resume from a ckpt')
 
 parser.add_argument('--version', 
-                    default='initial',
+                    default='fp16',
                     help='version')
 
 parser.add_argument('--weight', 

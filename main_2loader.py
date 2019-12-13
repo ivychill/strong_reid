@@ -22,6 +22,7 @@ from tqdm import tqdm
 import json
 import itertools
 from utils.re_ranking import reRanking
+from log import *
 
 
 class Main():
@@ -55,45 +56,35 @@ class Main():
         lr = self.scheduler.get_lr()[0]
 
         # for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
-        for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
+        for batch, (softmax_data, triplet_data) in enumerate(zip(self.softmax_train_loader, self.triplet_train_loader)):
             loss = 0
-            if softmax_data is not None:
-                softmax_inputs, softmax_labels = softmax_data
-                # 转cuda
-                softmax_inputs = softmax_inputs.to(self.device) if torch.cuda.device_count() >= 1 else softmax_inputs
-                softmax_labels = softmax_labels.to(self.device) if torch.cuda.device_count() >= 1 else softmax_labels
+            softmax_inputs, softmax_labels = softmax_data
+            # 转cuda
+            softmax_inputs = softmax_inputs.to(self.device) if torch.cuda.device_count() >= 1 else softmax_inputs
+            softmax_labels = softmax_labels.to(self.device) if torch.cuda.device_count() >= 1 else softmax_labels
 
-                softmax_score, softmax_outputs = self.model(softmax_inputs)
-                traditional_loss = self.softmax_loss(softmax_score, softmax_outputs, softmax_labels)
-                loss += traditional_loss
+            softmax_score, softmax_outputs = self.model(softmax_inputs)
+            traditional_loss = self.softmax_loss(softmax_score, softmax_outputs, softmax_labels)
+            loss += traditional_loss
 
-                losses.update(loss.item(), softmax_inputs.size(0))
-                prec = (softmax_score.max(1)[1] == softmax_labels).float().mean()
-                acc.update(prec, softmax_inputs.size(0))
+            losses.update(loss.item(), softmax_inputs.size(0))
+            prec = (softmax_score.max(1)[1] == softmax_labels).float().mean()
+            acc.update(prec, softmax_inputs.size(0))
 
-            if triplet_data is not None:
-                triplet_inputs, triplet_labels = triplet_data
-                # 转cuda
-                triplet_inputs = triplet_inputs.to(self.device) if torch.cuda.device_count() >= 1 else triplet_inputs
-                triplet_labels = triplet_labels.to(self.device) if torch.cuda.device_count() >= 1 else triplet_labels
-                triplet_score, triplet_outputs = self.model(triplet_inputs)
-                triplet_loss = self.triplet_loss(triplet_score, triplet_outputs, triplet_labels)
-                loss += triplet_loss
-
-            # # L0
-            # lambda0 = 5e-9
-            # all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
-            # l0_regularization = lambda0 * torch.norm(all_params, 0)
-            # loss += l0_regularization
-            #
-            # # L1
-            # lambda1 = 1e-6
-            # all_params = torch.cat([x.view(-1) for x in model.parameters()])    # 参数个数：53946664
-            # l1_regularization = lambda1 * torch.norm(all_params, 1)
-            # loss += l1_regularization
+            triplet_inputs, triplet_labels = triplet_data
+            # 转cuda
+            triplet_inputs = triplet_inputs.to(self.device) if torch.cuda.device_count() >= 1 else triplet_inputs
+            triplet_labels = triplet_labels.to(self.device) if torch.cuda.device_count() >= 1 else triplet_labels
+            triplet_score, triplet_outputs = self.model(triplet_inputs)
+            triplet_loss = self.triplet_loss(triplet_score, triplet_outputs, triplet_labels)
+            loss += triplet_loss
 
             self.optimizer.zero_grad()
-            loss.backward()
+            if opt.fp16:  # we use optimier to backward loss
+                with amp.scale_loss(loss, self.optimizer) as scaled_loss:
+                    scaled_loss.backward()
+            else:
+                loss.backward()
             self.optimizer.step()
 
             # 评估训练耗时
@@ -102,21 +93,20 @@ class Main():
 
             # 打印耗时与结果
             if (batch+1) % 10 == 0:
-                print('Epoch: [{}][{}/{}]\t'
+                logger.debug('Epoch: [{}][{}/{}]\t'
                       'Base_lr: [{:.2e}]\t'
                       'Time: ({batch_time.avg:.3f})\t'
                       'Loss_val: {loss.val:.4f}  (Loss_avg: {loss.avg:.4f})\t'
-                      'Accuray_val: {acc.val:.3f}  (Accuray_avg: {acc.avg:.3f})'.format(
+                      'Accuray_val: {acc.val:.4f}  (Accuray_avg: {acc.avg:.4f})'.format(
                        epoch, batch+1, len(self.softmax_train_loader), lr, batch_time=batch_time, loss=losses, acc=acc))
 
         # 每个epoch的结果
-        log = 'Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.3f}\t* Loss {loss.avg:.3f}'.format(epoch, lr, acc=acc, loss=losses)
-        print(log)
-
-        # 记录每个epoch的结果
+        log_text = 'Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.4f}\t* Loss {loss.avg:.4f}'.format(epoch, lr, acc=acc, loss=losses)
+        logger.info(log_text)
         with open(log_file, 'a') as f:
-            f.write(log + '\n')
+            f.write(log_text + '\n')
             f.flush()
+
 
     def pre(self):
 
@@ -189,16 +179,27 @@ class Main():
 
 
 if __name__ == '__main__':
-        # 随机种子
+    #### seed ####
     np.random.seed(2019)
     torch.manual_seed(2019)
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    print('********* opt config *********')
-    print(opt,'\n')
+    #### fp16 ####
+    try:
+        from apex.fp16_utils import *
+        from apex import amp, optimizers
+    except ImportError:  # will be 3.x series
+        print(
+        'This is not an error. If you want to use low precision, i.e., fp16, please install the apex with cuda support (https://github.com/NVIDIA/apex) and update pytorch to 1.0')
 
-    log_file = 'log/' + opt.version + time.strftime("%Y%m%d%H%M%S") + '.txt'
+    #### log ####
+    time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+    log_dir = os.path.join(os.path.expanduser('./log'), time_str)
+    if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
+        os.makedirs(log_dir)
+    set_logger(logger, log_dir)
+    log_file = os.path.join(log_dir, opt.version + '.txt')
     with open(log_file, 'a') as f:
         f.write(str(opt) + '\n')
         f.flush()
@@ -208,7 +209,10 @@ if __name__ == '__main__':
 
     data = Data()
     model = build_model(opt, data.num_classes)
+    model = model.to('cuda')
     optimizer = make_optimizer(opt, model)
+    if opt.fp16:
+        model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
     # loss = make_loss(opt, data.num_classes)
     # rejection_loss = make_rejection_loss(opt, data.num_classes)
     softmax_loss = make_softmax_loss(opt, data.num_classes)
@@ -222,14 +226,14 @@ if __name__ == '__main__':
     if opt.mode == 'train':
 
         # 总迭代次数
-        epoch = 250
+        epoch = 200
         start_epoch = 1
 
         # 断点加载训练
         if opt.resume:
             ckpt = torch.load(opt.resume)
             start_epoch = ckpt['epoch']
-            print('resume from the epoch: ', start_epoch)
+            logger.info('resume from the epoch: ', start_epoch)
             model.load_state_dict(ckpt['state_dict'])
             optimizer.load_state_dict(ckpt['optimizer'])
             # main = Main(model, data, optimizer, scheduler, loss)
@@ -248,6 +252,6 @@ if __name__ == '__main__':
                 torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
 
     if opt.mode == 'pre':
-        print('predict')
+        logger.info('predict')
         model.load_state_dict(torch.load(opt.weight)['state_dict'])
         main.pre()

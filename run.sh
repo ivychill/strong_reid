@@ -3,7 +3,7 @@
 case $1 in
 
     train)
-        python main.py --gpus=0 --batch=64
+        python main_2loader.py --fp16 --gpus=2 --batch=96
         ;;
 
     feat)
