@@ -126,7 +126,7 @@ if __name__ == '__main__':
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
         os.makedirs(log_dir)
     set_logger(logger, log_dir)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     cudnn.benchmark = False
 
     logger.debug('load data......')
@@ -135,8 +135,8 @@ if __name__ == '__main__':
         {'mat_path': 'out/fp16/feature.mat',
          'model_name': 'resnext101_ibn_a',
          'model_path': '~/.torch/models/resnext101_ibn_a.pth',
-         'weight': 'out/fp16/model_155.pth'},
+         'weight': 'out/fp16/model_185.pth'},
     ]
-    # for model in models:
-    #     feat = gen_feat(opt, model, data)
+    for model in models:
+        feat = gen_feat(opt, model, data)
     ensemble(models)

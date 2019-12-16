@@ -74,11 +74,11 @@ def make_dismat(feat_in):
 
 def gen_selected_test_path(data, distmat, selected_list_file):
     logger.debug('distmat shape: {}'.format(distmat.shape))
-    condition = (distmat > 0.9)
+    condition = (distmat > 0.8)
     sub_mat = np.where(condition, 1, 0)
     graph = nx.from_numpy_matrix(sub_mat)
     cliques = list(nx.find_cliques(graph))
-    logger.debug('cliques: {}'.format(cliques))
+    # logger.debug('cliques: {}'.format(cliques))
     maxList = max(cliques, key=len)
     maxLength = max(map(len, cliques))
     logger.debug('maxLength: {}'.format(maxLength))
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
     np.set_printoptions(threshold=np.inf)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
     cudnn.benchmark = False
 
     logger.debug('load data......')

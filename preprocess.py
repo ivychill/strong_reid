@@ -10,6 +10,8 @@ from tqdm import tqdm
 import cv2
 import random
 import os
+import shutil
+
 
 np.random.seed(2019)
 random.seed(2019)
@@ -45,66 +47,80 @@ def aug_img(img_path, flip=1, is_bright=1):
     img_crop = img3[y1:y1+256, x1:x1+128]
     return img_crop
 
-def aug_data(name, base, f, b, train_txt, new_dir='crop'):
+def aug_data(name, base, pid, f, b, target_list_file, target_dir):
     img_path = base + name
     img_crop = aug_img(img_path, flip=f, is_bright=b)
-    crop_name = name.replace('train', new_dir).split('.')[0] + ('_crop_%d_%d.jpg')%(f, b)
+    crop_name = name.replace('train', target_dir).split('.')[0] + ('_crop_%d_%d.jpg')%(f, b)
     crop_path = base + crop_name
     cv2.imwrite(crop_path, img_crop)
-    with open(train_txt, 'a') as f1:
+    with open(target_list_file, 'a') as f1:
         f1.write(crop_name + ' '+ pid +'\n')   
 
-base = './'
+def aug_list(source_list_file, target_list_file, base, target_dir):
+    if os.path.exists(target_list_file):
+        os.remove(target_list_file)
 
-with open('train_list.txt', 'r') as f:
-    lines = f.readlines()
+    if os.path.exists(target_dir):
+        shutil.rmtree(target_dir)
 
-data = {} 
-for line in lines:
-    _, people = line.strip().split()
+    os.makedirs(target_dir)
 
-    if people not in data.keys():
-        data[people] = 1
-    else:
-        data[people] += 1
+    with open(source_list_file, 'r') as f:
+        lines = f.readlines()
 
-print('data is ready to aug....')
+    data = {}
+    for line in lines:
+        _, people = line.strip().split()
+        if people not in data.keys():
+            data[people] = 1
+        else:
+            data[people] += 1
 
-cout = 0
+    print('data is ready to aug....')
+    cout = 0
 
-train_txt = 'aug_train_list.txt'
+    for line in (lines):
+        name, pid = line.strip().split()
 
-if os.path.exists(train_txt):
-    os.remove(train_txt)
+        # 原图路径写入txt
+        with open(target_list_file, 'a') as f:
+           f.write(name + ' '+ pid +'\n')
 
-if not os.path.exists('crop'):
-    os.makedirs('crop')
+        # id 对应一张图的数据，增加4倍
+        if data[pid] == 1:
+            for f1 in range(2):
+                for b1 in range(2):
+                    aug_data(name, base, pid, f1, b1, target_list_file, target_dir)
+                    cout += 1
 
-for line in (lines):
-
-    name, pid = line.strip().split()
-    img_path = base + name
-
-    # 原图路径写入txt
-    with open(train_txt, 'a') as f:
-       f.write(name + ' '+ pid +'\n')
-    
-    # id 对应一张图的数据，增加4倍
-    if data[pid] == 1:
-        for f1 in range(2):
-            for b1 in range(2):
-                aug_data(name, base, f1, b1, train_txt)   
+        # id 对应两张图的数据，增加2倍
+        elif data[pid] == 2:
+            for b2 in range(2):
+                aug_data(name, base, pid, 1, b2, target_list_file, target_dir)
                 cout += 1
-                
-    # id 对应两张图的数据，增加2倍
-    elif data[pid] == 2:
-        for b2 in range(2):
-            aug_data(name, base, 1, b2, train_txt)
+
+        # id 对应三张图的数据，增加一倍
+        elif data[pid] == 3:
+            b3 = 1
+            aug_data(name, base, pid, 1, b3, target_list_file, target_dir)
             cout += 1
-            
-    # id 对应三张图的数据，增加一倍
-    elif data[pid] == 3:
-        b3 = 1
-        aug_data(name, base, 1, b3, train_txt)
-        cout += 1
-    print(cout)
+        print(cout)
+
+
+if __name__ == '__main__':
+    base = './'
+    # source_list_file = 'train_list.txt'
+    # target_list_file = 'aug_train_list.txt'
+    # target_dir = 'aug_train'
+
+    source_list_file = 'train_query_list.txt'
+    target_list_file = 'aug_train_query_list.txt'
+    target_dir = 'aug_train_query'
+
+    aug_list(source_list_file, target_list_file, base, target_dir)
+
+    source_list_file = 'train_triplet_query_list.txt'
+    target_list_file = 'aug_train_triplet_query_list.txt'
+    target_dir = 'aug_train_triplet_query'
+
+    aug_list(source_list_file, target_list_file, base, target_dir)

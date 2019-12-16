@@ -101,7 +101,7 @@ class Main():
                        epoch, batch+1, len(self.softmax_train_loader), lr, batch_time=batch_time, loss=losses, acc=acc))
 
         # 每个epoch的结果
-        log_text = 'Epoch[{}]:  * Base_lr {:.2e}\t* Accuray {acc.avg:.4f}\t* Loss {loss.avg:.4f}'.format(epoch, lr, acc=acc, loss=losses)
+        log_text = 'Epoch[{}]\tBase_lr {:.2e}\tAccuray {acc.avg:.4f}\tLoss {loss.avg:.4f}'.format(epoch, lr, acc=acc, loss=losses)
         logger.info(log_text)
         with open(log_file, 'a') as f:
             f.write(log_text + '\n')

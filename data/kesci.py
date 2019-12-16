@@ -59,8 +59,8 @@ class Kesci(BaseImageDataset):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
         # self.train_dir = osp.join(self.dataset_dir, 'aug_train_list.txt')
-        self.softmax_train_dir = osp.join(self.dataset_dir, 'train_softmax.txt')
-        self.triplet_train_dir = osp.join(self.dataset_dir, 'train_triplet.txt')
+        self.softmax_train_dir = osp.join(self.dataset_dir, 'train_softmax_list.txt')
+        self.triplet_train_dir = osp.join(self.dataset_dir, 'aug_train_triplet_query_list.txt')
         # self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
         self.query_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
         self.gallery_dir = osp.join(self.dataset_dir, 'gallery_a')
@@ -186,7 +186,12 @@ class Data():
         #     sampler=RandomIdentitySampler(dataset.train, opt.batch, opt.instance),
         #     #sampler=RandomIdentitySampler_alignedreid(dataset.train, cfg.DATALOADER.NUM_INSTANCE),      # new add by gu
         #     num_workers=opt.num_workers)
-        self.softmax_train_loader = DataLoader(self.softmax_train_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
+        # self.softmax_train_loader = DataLoader(
+        #     self.softmax_train_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
+        self.softmax_train_loader = DataLoader(
+            self.softmax_train_set, batch_size=opt.batch,
+            sampler=RandomIdentitySampler(dataset.softmax_train, opt.batch, opt.instance),
+            num_workers=opt.num_workers,)
         self.triplet_train_loader = DataLoader(
             self.triplet_train_set, batch_size=opt.batch,
             sampler=RandomIdentitySampler(dataset.triplet_train, opt.batch, opt.instance),
