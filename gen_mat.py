@@ -27,12 +27,12 @@ def gen_feat(opt, model_, data):
     opt.weight = model_['weight']
     print(opt,'\n')
     if opt.model_name == 'se_resnext50':
-        model = build_model(opt, 2432)
+        model = build_model(opt, 4950)
         # model.load_state_dict(torch.load(opt.weight))
         model.load_param(opt.weight)
     else:
+        model = build_model(opt, 4950)
         # model = build_model(opt, data.num_classes)
-        model = build_model(opt, 2035)
         model.load_state_dict(torch.load(opt.weight)['state_dict'])
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
@@ -47,10 +47,10 @@ def gen_feat(opt, model_, data):
     feature = feat.numpy()
     result = {'test_f': feature}
 
-    mat_dir, mat_file = os.path.split(model_['mat_path'])
+    mat_dir, mat_file = os.path.split(model_['feat_path'])
     if not os.path.exists(mat_dir):
         os.makedirs(mat_dir, exist_ok=True)
-    scipy.io.savemat(model_['mat_path'], result)
+    scipy.io.savemat(model_['feat_path'], result)
 
     return feature
 
@@ -75,10 +75,10 @@ if __name__ == '__main__':
     data = Data()
 
     models =  [
-        {'mat_path': 'out/initial/feature.mat',
+        {'feat_path': 'out/bnneck/feature_761.mat',
          'model_name': 'resnext101_ibn_a',
          'model_path': '~/.torch/models/resnext101_ibn_a.pth',
-         'weight': 'out/2loader/model_150.pth'},
+         'weight': 'out/fp16/model_185.pth'}
     ]
 
     for model in models:

@@ -107,6 +107,7 @@ def get_feat(mat_file):
     return feature
 
 def mmd(source_feature, target_feature):
+    iter_num = min(source_feature.shape[0], target_feature.shape[0]) // opt.batch
     soutce_target = 0
     for run in range(10):
         np.random.shuffle(source_feature)
@@ -116,7 +117,7 @@ def mmd(source_feature, target_feature):
             source_feat = source_feature[(index) * opt.batch:(index + 1) * opt.batch]
             target_feat = target_feature[(index) * opt.batch:(index + 1) * opt.batch]
             s_t = float(mmd_loss(torch.from_numpy(source_feat), torch.from_numpy(target_feat)))
-            logger.debug('run {} index {}: {:.4f}'.format(run, index, s_t))
+            # logger.debug('run {} index {}: {:.4f}'.format(run, index, s_t))
             total_s_t += s_t
         average_s_t = total_s_t / (iter_num - 1)
         logger.debug('run {} average: {:.4f}'.format(run, average_s_t))
@@ -127,7 +128,7 @@ def mmd(source_feature, target_feature):
 if __name__ == '__main__':
     #### log ####
     time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-    log_dir = os.path.join(os.path.expanduser('./log'), time_str)
+    log_dir = os.path.join(os.path.expanduser('./log'), opt.version + '_' + time_str)
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
         os.makedirs(log_dir)
     set_logger(logger, log_dir)
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
     cudnn.benchmark = False
 
     data = Data()
@@ -151,13 +152,23 @@ if __name__ == '__main__':
     opt.batch = 256
     # features = gen_feats(opt, model, data)
     features = get_feats(model)
-    iter_num = features[1].shape[0] // opt.batch
+
     mmd_loss = MMD_loss()
 
-    for feat in features:
-        feat_c = feat.copy()
-        mmd(feat, feat_c)
+    # 0.0248, 0.0236, 0.0247
+    # for feat in features:
+    #     feat_c = feat.copy()
+    #     mmd(feat, feat_c)
+    #
+    # 0.0776, 0.1160, 0.0749
+    # feat_coms = itertools.combinations(features, 2)
+    # for feat_com in feat_coms:
+    #     mmd(feat_com[0], feat_com[1])
 
-    feat_coms = itertools.combinations(features, 2)
-    for feat_com in feat_coms:
-        mmd(feat_com[0], feat_com[1])
+    # 0.0966
+    # feat_train = features[0]
+    # print('len: ', feat_train.shape[0])
+    # half = feat_train.shape[0]//2
+    # first_half = feat_train[0:half]
+    # second_half = feat_train[half:half*2]
+    # mmd(first_half, second_half)

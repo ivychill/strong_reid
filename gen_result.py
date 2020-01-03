@@ -81,14 +81,19 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(2019)
     random.seed(2019)
 
-    time_str = time.strftime("_%Y%m%d_%H%M%S", time.localtime())
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    time_str = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
     cudnn.benchmark = False
+
     data = Data()
 
     models =  [
-        {'mat_path': 'out/initial/feature.mat',
+        {'mat_path': 'out/bnneck/feature_761.mat',
          'model_name': 'resnext101_ibn_a'},
+        {'mat_path': 'out/mgn/feature_771.mat',
+         'model_name': 'resnext101_ibn_a'},
+        {'mat_path': 'out/can/feature_763.mat',
+         'model_name': 'densenet121'},  # model_name is irrelevant
     ]
 
     ensemble(models)

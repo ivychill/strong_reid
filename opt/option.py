@@ -31,11 +31,11 @@ parser.add_argument('--version',
 
 parser.add_argument('--weight', 
                     type= str, 
-                    default='out/resnext101_ibn_a/model_180.pth',
+                    default='out/xxx/model_xxx.pth',
                     help='weight')
 
 parser.add_argument('--model_name',
-                    default='resnext101_ibn_a',
+                    default='resnet50_ibn_a',
                     help='backbone of the network')
 
 parser.add_argument('--pretrained',
@@ -67,7 +67,7 @@ parser.add_argument('--instance',
                     help='instance for each id in a batch')
 
 parser.add_argument('--model_path',
-                    default='/home/kcadmin/.torch/models/resnext101_ibn_a.pth',
+                    default='/home/kcadmin/.torch/models/r50_ibn_a.pth',
                     help='pretrained model ')
 
 parser.add_argument('--MARGIN',

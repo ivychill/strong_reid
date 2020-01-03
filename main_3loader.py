@@ -11,8 +11,7 @@ from opt import opt
 from model import build_model
 from data import Data
 from utils import make_optimizer, AverageMeter, WarmupMultiStepLR, extract_feature
-from loss import make_triplet_loss
-from loss import make_softmax_loss
+from loss import make_triplet_loss, make_softmax_loss, make_rejection_loss
 import argparse
 from torch.backends import cudnn
 import numpy as np
@@ -27,9 +26,10 @@ from log import *
 
 class Main():
 
-    def __init__(self, opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, device="cuda"):
+    def __init__(self, opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, rejection_loss=None, device="cuda"):
         self.softmax_train_loader = data.softmax_train_loader
         self.triplet_train_loader = data.triplet_train_loader
+        self.gallery_loader = data.gallery_loader
         self.test_loader = data.test_loader
         self.gallery_paths = data.gallery_paths
         self.query_paths = data.query_paths
@@ -42,6 +42,7 @@ class Main():
 
         self.softmax_loss = softmax_loss
         self.triplet_loss = triplet_loss
+        self.rejection_loss = rejection_loss
         self.optimizer = optimizer
         self.scheduler = scheduler
     
@@ -56,8 +57,10 @@ class Main():
         lr = self.scheduler.get_lr()[0]
 
         # for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
-        for batch, (softmax_data, triplet_data) in enumerate(zip(self.softmax_train_loader, self.triplet_train_loader)):
+        for batch, (softmax_data, triplet_data, rejection_data) \
+                in enumerate(zip(self.softmax_train_loader, self.triplet_train_loader, self.gallery_loader)):
             loss = 0
+            # 1st loss
             softmax_inputs, softmax_labels = softmax_data
             # 转cuda
             softmax_inputs = softmax_inputs.to(self.device) if torch.cuda.device_count() >= 1 else softmax_inputs
@@ -71,6 +74,7 @@ class Main():
             prec = (softmax_score.max(1)[1] == softmax_labels).float().mean()
             acc.update(prec, softmax_inputs.size(0))
 
+            # 2nd loss
             triplet_inputs, triplet_labels = triplet_data
             # 转cuda
             triplet_inputs = triplet_inputs.to(self.device) if torch.cuda.device_count() >= 1 else triplet_inputs
@@ -78,6 +82,15 @@ class Main():
             triplet_score, triplet_outputs = self.model(triplet_inputs)
             triplet_loss = self.triplet_loss(triplet_score, triplet_outputs, triplet_labels)
             loss += triplet_loss
+
+            # 3rd loss
+            rejection_inputs, rejection_labels = rejection_data
+            # 转cuda
+            rejection_inputs = rejection_inputs.to(self.device) if torch.cuda.device_count() >= 1 else rejection_inputs
+            rejection_labels = rejection_labels.to(self.device) if torch.cuda.device_count() >= 1 else rejection_labels
+            rejection_score, rejection_outputs = self.model(rejection_inputs)
+            rejection_loss = self.rejection_loss(rejection_score)
+            loss += rejection_loss * 0.1
 
             self.optimizer.zero_grad()
             if opt.fp16:  # we use optimier to backward loss
@@ -207,7 +220,6 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus
     cudnn.benchmark = True
 
-    logger.debug('load data......')
     data = Data()
     model = build_model(opt, data.num_classes)
     model = model.to('cuda')
@@ -218,19 +230,18 @@ if __name__ == '__main__':
     # rejection_loss = make_rejection_loss(opt, data.num_classes)
     softmax_loss = make_softmax_loss(opt, data.num_classes)
     triplet_loss = make_triplet_loss(opt, data.num_classes)
+    rejection_loss = make_rejection_loss(opt, data.num_classes)
 
     # WARMUP_FACTOR: 0.01
     # WARMUP_ITERS: 10
     scheduler = WarmupMultiStepLR(optimizer, opt.steps, 0.1, 0.01, 10, "linear")
-    main = Main(opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss)
+    main = Main(opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, rejection_loss)
 
     if opt.mode == 'train':
 
         # 总迭代次数
         epoch = 200
         start_epoch = 1
-        # out_dir = os.path.join('out', opt.version + '_' + time_str)
-        out_dir = os.path.join('out', opt.version)
 
         # 断点加载训练
         if opt.resume:
@@ -243,16 +254,16 @@ if __name__ == '__main__':
             for epoch in range(start_epoch,  epoch + 1):
                 main.train(epoch)
                 if epoch >= 100 and epoch % 5 == 0:
-                    os.makedirs(out_dir, exist_ok=True)
+                    os.makedirs('out/' + opt.version, exist_ok=True)
                     state = {'state_dict':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
-                    torch.save(state, (out_dir + '/model_{}.pth'.format(epoch)))
+                    torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
 
         for epoch in range(start_epoch, epoch + 1):
             main.train(epoch)
             if epoch >= 100 and epoch % 5 == 0:
-                os.makedirs(out_dir, exist_ok=True)
+                os.makedirs('out/'+ opt.version, exist_ok=True)
                 state = {'state_dict':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch}
-                torch.save(state, (out_dir + '/model_{}.pth'.format(epoch)))
+                torch.save(state, ('out/'+ opt.version + '/model_{}.pth'.format(epoch)))
 
     if opt.mode == 'pre':
         logger.info('predict')

@@ -53,30 +53,28 @@ class ImageDataset(Dataset):
 
 class Kesci(BaseImageDataset):
 
-    dataset_dir = 'match_2'
+    dataset_dir = 'match_2b'
 
     def __init__(self, root, verbose=True, **kwargs):
         super(Kesci, self).__init__()
         self.dataset_dir = osp.join(root, self.dataset_dir)
         # self.train_dir = osp.join(self.dataset_dir, 'aug_train_list.txt')
-        self.softmax_train_dir = osp.join(self.dataset_dir, 'train_softmax_list.txt')
+        self.softmax_train_dir = osp.join(self.dataset_dir, 'train_softmax_threshold_list.txt')
+        # self.softmax_train_dir = osp.join(self.dataset_dir, 'train_softmax_blended_list.txt')
         self.triplet_train_dir = osp.join(self.dataset_dir, 'aug_train_triplet_query_list.txt')
-        # self.train_dir = osp.join(self.dataset_dir, 'plus_query.txt')
-        self.query_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
-        self.gallery_dir = osp.join(self.dataset_dir, 'gallery_a')
-
-        # self.query_a_dir = osp.join(self.dataset_dir, 'query_a_list.txt')
-        # self.gallery_a_dir = osp.join(self.dataset_dir, 'gallery_a')
-
+        self.query_dir = osp.join(self.dataset_dir, 'query_b')
+        # self.query_dir = osp.join(self.dataset_dir, 'query_b_list.txt')
+        self.gallery_dir = osp.join(self.dataset_dir, 'gallery_b')
+        # self.gallery_dir = osp.join(self.dataset_dir, 'gallery_b_list.txt')
         self._check_before_run()
 
         # train = self._process_train(self.train_dir, relabel=True)
         softmax_train = self._process_train(self.softmax_train_dir, relabel=True)
         triplet_train = self._process_train(self.triplet_train_dir, relabel=True)
-        query = self._process_train(self.query_dir, relabel=True)
+        query = self._process_test(self.query_dir)
+        # query = self._process_train(self.query_dir, relabel=True)
         gallery = self._process_test(self.gallery_dir)
-        # query_a = self._process_train(self.query_a_dir, relabel=True)
-        # gallery_a = self._process_test(self.gallery_a_dir)
+        # gallery = self._process_train(self.gallery_dir, relabel=True)
 
         if verbose:
             # self.print_dataset_statistics(train, query, gallery)
@@ -87,9 +85,6 @@ class Kesci(BaseImageDataset):
         self.triplet_train = triplet_train
         self.query = query
         self.gallery = gallery
-
-        # self.query_a = query_a
-        # self.gallery_a = gallery_a
 
         # self.num_train_pids, self.num_train_imgs = self.get_imagedata_info(self.train)
         self.num_train_pids, self.num_train_imgs = self.get_imagedata_info(self.softmax_train)
@@ -109,11 +104,6 @@ class Kesci(BaseImageDataset):
         if not osp.exists(self.gallery_dir):
             raise RuntimeError("'{}' is not available".format(self.gallery_dir))
 
-        # if not osp.exists(self.query_a_dir):
-        #     raise RuntimeError("'{}' is not available".format(self.query_a_dir))
-        # if not osp.exists(self.gallery_a_dir):
-        #     raise RuntimeError("'{}' is not available".format(self.gallery_a_dir))
-            
     def _process_test(self, dir_path):
         dataset = []
         img_paths = glob.glob(osp.join(dir_path, '*.png'))
@@ -122,7 +112,6 @@ class Kesci(BaseImageDataset):
             dataset.append((p, 0))
 
         return dataset
-        
 
     def _process_train(self, dir_path, relabel=False):
         dataset = []
@@ -170,11 +159,8 @@ class Data():
         self.softmax_train_set = ImageDataset(dataset.softmax_train, train_transform)
         self.triplet_train_set = ImageDataset(dataset.triplet_train, train_transform)
         self.query_set = ImageDataset(dataset.query, test_transform)
-        # self.query_a_set = ImageDataset(dataset.query_a, test_transform)
         self.test_set = ImageDataset(dataset.query + dataset.gallery, test_transform)
-        # self.test_a_set = ImageDataset(dataset.query_a + dataset.gallery_a, test_transform)
         self.query_paths = [q[0] for q in dataset.query]
-        # self.query_a_paths = [ q[0] for q in dataset.query_a]
         self.gallery_paths = [g[0] for g in dataset.gallery]
 
         # for select test
@@ -197,9 +183,7 @@ class Data():
             sampler=RandomIdentitySampler(dataset.triplet_train, opt.batch, opt.instance),
             num_workers=opt.num_workers)
         self.query_loader = DataLoader(self.query_set, batch_size=opt.batch, shuffle=False, num_workers=opt.num_workers,)
-        # self.query_a_loader = DataLoader(self.query_a_set, batch_size=opt.batch, shuffle=True, num_workers=opt.num_workers,)
-        self.test_loader = DataLoader(self.test_set, batch_size=opt.batch*16, shuffle=False, num_workers=opt.num_workers,)
-        # self.test_a_loader = DataLoader(self.test_a_set, batch_size=opt.batch*16, shuffle=False, num_workers=opt.num_workers,)
+        self.test_loader = DataLoader(self.test_set, batch_size=opt.batch*4, shuffle=False, num_workers=opt.num_workers,)
         # print('train:', len(self.train_set))
         # print('train:', len(self.train_loader))
         print('softmax_train:', len(self.softmax_train_set))

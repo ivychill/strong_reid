@@ -11,8 +11,7 @@ from opt import opt
 from model import build_model
 from data import Data
 from utils import make_optimizer, AverageMeter, WarmupMultiStepLR, extract_feature
-from loss import make_triplet_loss
-from loss import make_softmax_loss
+from loss import make_triplet_loss, make_softmax_loss, make_entropy_loss
 import argparse
 from torch.backends import cudnn
 import numpy as np
@@ -27,10 +26,10 @@ from log import *
 
 class Main():
 
-    def __init__(self, opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, device="cuda"):
+    def __init__(self, opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, entropy_loss, device="cuda"):
         self.softmax_train_loader = data.softmax_train_loader
         self.triplet_train_loader = data.triplet_train_loader
-        self.test_loader = data.test_loader
+        self.gallery_loader = data.gallery_loader
         self.gallery_paths = data.gallery_paths
         self.query_paths = data.query_paths
         self.num_query = len(data.query_paths)
@@ -42,6 +41,7 @@ class Main():
 
         self.softmax_loss = softmax_loss
         self.triplet_loss = triplet_loss
+        self.entropy_loss = entropy_loss
         self.optimizer = optimizer
         self.scheduler = scheduler
     
@@ -56,21 +56,22 @@ class Main():
         lr = self.scheduler.get_lr()[0]
 
         # for batch, (softmax_data, triplet_data) in enumerate(itertools.zip_longest(self.softmax_train_loader, self.triplet_train_loader)):
-        for batch, (softmax_data, triplet_data) in enumerate(zip(self.softmax_train_loader, self.triplet_train_loader)):
+        for batch, (softmax_data, triplet_data, gallery_data) in enumerate(zip(self.softmax_train_loader, self.triplet_train_loader, self.gallery_loader)):
             loss = 0
+            # 1st
             softmax_inputs, softmax_labels = softmax_data
             # 转cuda
             softmax_inputs = softmax_inputs.to(self.device) if torch.cuda.device_count() >= 1 else softmax_inputs
             softmax_labels = softmax_labels.to(self.device) if torch.cuda.device_count() >= 1 else softmax_labels
-
             softmax_score, softmax_outputs = self.model(softmax_inputs)
             traditional_loss = self.softmax_loss(softmax_score, softmax_outputs, softmax_labels)
             loss += traditional_loss
-
+            # total
             losses.update(loss.item(), softmax_inputs.size(0))
             prec = (softmax_score.max(1)[1] == softmax_labels).float().mean()
             acc.update(prec, softmax_inputs.size(0))
 
+            # 2nd
             triplet_inputs, triplet_labels = triplet_data
             # 转cuda
             triplet_inputs = triplet_inputs.to(self.device) if torch.cuda.device_count() >= 1 else triplet_inputs
@@ -79,12 +80,29 @@ class Main():
             triplet_loss = self.triplet_loss(triplet_score, triplet_outputs, triplet_labels)
             loss += triplet_loss
 
+            # 3rd
+            gallery_inputs, gallery_labels = gallery_data
+            gallery_inputs = gallery_inputs.to(self.device) if torch.cuda.device_count() >= 1 else gallery_inputs
+            gallery_score, gallery_outputs = self.model(gallery_inputs)
+            query_feats = []
+            for query_inputs, query_labels in data.query_loader:
+                query_inputs = query_inputs.cuda()
+                query_score, query_outputs = model(query_inputs)
+                query_feats.append(query_outputs)
+                logger.debug('query_outputs: {}'.format(query_outputs.shape))
+            query_feats = torch.cat(query_feats, dim=0)
+            logger.debug('query_feats: {}'.format(query_feats.shape))
+            entropy = self.entropy_loss(gallery_outputs, query_feats)
+            loss += entropy
+
+
             self.optimizer.zero_grad()
             if opt.fp16:  # we use optimier to backward loss
                 with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                     scaled_loss.backward()
             else:
                 loss.backward()
+                # loss.backward(retain_graph=True)
             self.optimizer.step()
 
             # 评估训练耗时
@@ -218,11 +236,12 @@ if __name__ == '__main__':
     # rejection_loss = make_rejection_loss(opt, data.num_classes)
     softmax_loss = make_softmax_loss(opt, data.num_classes)
     triplet_loss = make_triplet_loss(opt, data.num_classes)
+    entropy_loss = make_entropy_loss(opt)
 
     # WARMUP_FACTOR: 0.01
     # WARMUP_ITERS: 10
     scheduler = WarmupMultiStepLR(optimizer, opt.steps, 0.1, 0.01, 10, "linear")
-    main = Main(opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss)
+    main = Main(opt, model, data, optimizer, scheduler, softmax_loss, triplet_loss, entropy_loss)
 
     if opt.mode == 'train':
 

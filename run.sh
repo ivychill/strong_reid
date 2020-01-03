@@ -3,7 +3,7 @@
 case $1 in
 
     train)
-        python main_2loader.py --fp16 --gpus=3 --batch=96
+        python main_2loader.py --fp16 --gpus=2 --batch=96 --version=blend_r50
         ;;
 
     feat)

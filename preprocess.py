@@ -28,7 +28,7 @@ def aug_img(img_path, flip=1, is_bright=1):
     left = random.uniform(0, 22)
     top = random.uniform(0, 34)
             
-    br = random.uniform(1.3,1.6)
+    br = random.uniform(1.3, 1.6)
     bk = random.uniform(0.6, 0.8)
     if is_bright:
         image *= br
@@ -47,10 +47,11 @@ def aug_img(img_path, flip=1, is_bright=1):
     img_crop = img3[y1:y1+256, x1:x1+128]
     return img_crop
 
-def aug_data(name, base, pid, f, b, target_list_file, target_dir):
-    img_path = base + name
+def aug_data(relative_path, base, pid, f, b, target_list_file, target_dir):
+    img_path = base + relative_path
+    subdir, file = relative_path.split('/')
     img_crop = aug_img(img_path, flip=f, is_bright=b)
-    crop_name = name.replace('train', target_dir).split('.')[0] + ('_crop_%d_%d.jpg')%(f, b)
+    crop_name = relative_path.replace(subdir, target_dir).split('.')[0] + ('_crop_%d_%d.jpg')%(f, b)
     crop_path = base + crop_name
     cv2.imwrite(crop_path, img_crop)
     with open(target_list_file, 'a') as f1:
@@ -80,29 +81,29 @@ def aug_list(source_list_file, target_list_file, base, target_dir):
     cout = 0
 
     for line in (lines):
-        name, pid = line.strip().split()
+        relative_path, pid = line.strip().split()
 
         # 原图路径写入txt
         with open(target_list_file, 'a') as f:
-           f.write(name + ' '+ pid +'\n')
+           f.write(relative_path + ' '+ pid +'\n')
 
         # id 对应一张图的数据，增加4倍
         if data[pid] == 1:
             for f1 in range(2):
                 for b1 in range(2):
-                    aug_data(name, base, pid, f1, b1, target_list_file, target_dir)
+                    aug_data(relative_path, base, pid, f1, b1, target_list_file, target_dir)
                     cout += 1
 
         # id 对应两张图的数据，增加2倍
         elif data[pid] == 2:
             for b2 in range(2):
-                aug_data(name, base, pid, 1, b2, target_list_file, target_dir)
+                aug_data(relative_path, base, pid, 1, b2, target_list_file, target_dir)
                 cout += 1
 
         # id 对应三张图的数据，增加一倍
         elif data[pid] == 3:
             b3 = 1
-            aug_data(name, base, pid, 1, b3, target_list_file, target_dir)
+            aug_data(relative_path, base, pid, 1, b3, target_list_file, target_dir)
             cout += 1
         print(cout)
 
@@ -113,14 +114,12 @@ if __name__ == '__main__':
     # target_list_file = 'aug_train_list.txt'
     # target_dir = 'aug_train'
 
-    source_list_file = 'train_query_list.txt'
-    target_list_file = 'aug_train_query_list.txt'
-    target_dir = 'aug_train_query'
-
-    aug_list(source_list_file, target_list_file, base, target_dir)
+    # source_list_file = 'train_query_list.txt'
+    # target_list_file = 'aug_train_query_list.txt'
+    # target_dir = 'aug_train_query'
+    # aug_list(source_list_file, target_list_file, base, target_dir)
 
     source_list_file = 'train_triplet_query_list.txt'
     target_list_file = 'aug_train_triplet_query_list.txt'
     target_dir = 'aug_train_triplet_query'
-
     aug_list(source_list_file, target_list_file, base, target_dir)

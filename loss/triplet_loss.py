@@ -168,3 +168,18 @@ class IrLoss(nn.Module):
         if self.use_gpu: targets = targets.cuda()
         loss = (- targets * log_probs).mean(0).sum()
         return loss
+
+# Unknown Identity Rejection Loss
+class EntropyLoss(nn.Module):
+    def __init__(self, use_gpu=True):
+        super(EntropyLoss, self).__init__()
+        self.use_gpu = use_gpu
+        self.softmax = nn.Softmax(dim=1)
+        self.logsoftmax = nn.LogSoftmax(dim=1)
+
+    def forward(self, source_feat, target_feat):
+        dist_mat = euclidean_dist(source_feat, target_feat) * (-1.0)
+        probs = self.softmax(dist_mat)
+        log_probs = self.logsoftmax(dist_mat)
+        loss = (- probs * log_probs).mean(0).sum()
+        return loss

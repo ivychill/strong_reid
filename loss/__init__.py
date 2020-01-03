@@ -6,7 +6,7 @@
 
 import torch.nn.functional as F
 
-from .triplet_loss import TripletLoss, CrossEntropyLabelSmooth, IrLoss
+from .triplet_loss import TripletLoss, CrossEntropyLabelSmooth, IrLoss, EntropyLoss
 from .center_loss import CenterLoss
 
 
@@ -37,10 +37,19 @@ def make_loss(opt, num_classes):    # modified by gu
     return loss_func
 
 def make_rejection_loss(opt, num_classes):
-    xent = IrLoss(num_classes=num_classes)
+    ir = IrLoss(num_classes=num_classes)
 
     def loss_func(score):
-        return xent(score)
+        return ir(score)
+
+    return loss_func
+
+def make_entropy_loss(opt):
+    entropy = EntropyLoss()
+    # source_feat: [batch_size] of n_gallery
+    # target_feat: [n_query]
+    def loss_func(source_feat, target_feat):
+        return entropy(source_feat, target_feat)
 
     return loss_func
 
